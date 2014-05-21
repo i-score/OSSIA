@@ -4,7 +4,7 @@ OSSIA
 The base repository for the OSSIA project. Contains initialization and build scripts.
 
 For now, there is a build script that works for Unix OSes.
-Every command are detailed when called with --help.
+Every command are detailed when called with `--help`.
 
 Setup
 =====
