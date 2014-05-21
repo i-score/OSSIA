@@ -53,7 +53,8 @@ On OS X, due to the lack of package manager, make install is called. However, a 
 
 ## Installing brew on Mac OS X
 To install brew, run in a terminal : 
-`ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"`
+
+    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 
 ## Missing packages on ubuntu 13.10
 In this case, the following packages must be installed manually from the Trusty archive in this order: 
