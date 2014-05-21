@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 ########################################
 ###### Intro & Parameter handling ######
 ########################################
@@ -420,8 +420,13 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cp -rf /usr/local/jamoma* $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
 
 		# Jamoma rpath
-		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
-		install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/$ISCORE_EXECUTABLE_NAME
+		if [[ $ISCORE_RECAST ]]; then
+			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-scoreRecast
+			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-scoreRecast
+		else
+			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
+			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
+		fi			
 	else
 		echo "System not supported yet."
 	fi
