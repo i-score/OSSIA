@@ -9,7 +9,8 @@ Every command are detailed when called with `--help`.
 They were tested on Mac OS X 10.9, Debian Jessie, Fedora 19, Ubuntu 14.04 and Ubuntu 13.10.
 Please refer to the additional notes prior to running the commands.
 
-# Setup (Requires brew / macports on OS X)
+# Setup 
+### (Requires brew / macports on OS X)
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
@@ -27,7 +28,7 @@ In the name of quickness, the commands only fetch the latest git commits, which 
 
 So if you want to develop, please add the `--fetch-all` command.
 
-# Just building when everything is already set-up 
+# Build
 
     ./Build.sh [name]
     
