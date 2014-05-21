@@ -31,7 +31,7 @@ So if you want to develop, please add the `--fetch-all` command.
 
     ./Build.sh [name]
     
-    where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
+where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
     
 ## Old setup (Mac OS X only, doesn't require brew / macports)
 Follow this if you already have some parts of the OSSIA project on your computer.
