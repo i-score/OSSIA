@@ -11,10 +11,14 @@ Setup
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
+    
+Which will create an i-score0.2 executable file on Linux, and an i-score0.2.app on OS X.
 
 If you want to try the next version of i-score (0.3), which is only at the prototype state run : 
 
     ./Build.sh jamoma iscore-recast --clone --install-deps
+    
+Which will create an i-score0.3 executable file on Linux, and an i-score0.3.app on OS X.
 
 Setup for developers
 ====================
