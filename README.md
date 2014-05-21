@@ -6,6 +6,9 @@ The base repository for the OSSIA project. Contains initialization and build scr
 For now, there is a build script that works for Unix OSes.
 Every command are detailed when called with `--help`.
 
+They were tested on Mac OS X 10.9, Debian Jessie, Fedora 19, Ubuntu 14.04 and Ubuntu 13.10.
+Please refer to the additional notes prior to running the commands.
+
 # Setup (Requires brew / macports on OS X)
 If you want to try the current i-score release quickly, run : 
 
@@ -24,7 +27,13 @@ In the name of quickness, the commands only fetch the latest git commits, which 
 
 So if you want to develop, please add the `--fetch-all` command.
 
-# Old setup (Mac OS X only, doesn't require brew / macports)
+# Just building when everything is already set-up 
+
+    ./Build.sh [name]
+    
+    where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
+    
+## Old setup (Mac OS X only, doesn't require brew / macports)
 Follow this if you already have some parts of the OSSIA project on your computer.
 
 If you already have a Jamoma / Score installed using the Ruby scripts : 
@@ -35,12 +44,7 @@ Or if you already have Jamoma but not Score
 
     ./Build.sh jamoma iscore --clone --classic --install-deps --jamoma-path=/Path/To/Jamoma/Core/folder
     
-# Just building when everything is already set-up 
 
-    ./Build.sh [name]
-    
-    where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
-    
 # Additional notes
 ## Packages
 For Linux, Jamoma is packed either on a Debian package for Debian, Ubuntu or RPM for Fedora and installed, so it might ask your root password.
