@@ -20,7 +20,7 @@ Setup for developers
 ====================
 In the name of quickness, the commands only fetch the latest git commits, which can be a problem if you want to develop, switch branches, etc...
 
-So if you want to develop, please add the --fetch-all command.
+So if you want to develop, please add the `--fetch-all` command.
 
 Old setup (Mac OS X only)
 =========================
