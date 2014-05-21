@@ -39,6 +39,8 @@ Options :
   Builds everything with debug informations.
 --use-clang
   Builds everything with the Clang compiler. Only useful on Linux systems.
+--multi
+  Builds using all your cores.
 --android
   Cross-build for Android. Only i-score 0.3. Requires the NDK & a toolchain with compiled libs. See AndroidBuild.txt.
   To cross-build, please set ANDROID_NDK_ROOT to your NDK path and ANDROID_QT_BIN to the corresponding qmake executable folder.
@@ -90,6 +92,9 @@ do
 	--jamoma-path=*)
 		ISCORE_JAMOMA_PATH=$(cd "${1#*=}"; pwd)
 		echo "Will use the Jamoma installation located in ${ISCORE_JAMOMA_PATH}"
+		;;
+	--multi) echo "Will build using every logical core"
+		ISCORE_ENABLE_MULTICORE=1
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
@@ -183,6 +188,17 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' ]]; then # apt
 		ISCORE_DEBIAN=1
 	fi
+fi
+
+###### Build using all the cores ######
+if [[ $ISCORE_ENABLE_MULTICORE ]]; then
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		ISCORE_NUM_THREADS=`nproc`
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		ISCORE_NUM_THREADS=`sysctl -n hw.ncpu`
+	fi
+else
+	ISCORE_NUM_THREADS=1
 fi
 
 ###### Set compiler toolchains ######
@@ -324,7 +340,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			su -c 'ln -s /usr/local/lib/jamoma/lib/* -t /usr/lib'
 
 		elif [[ $ISCORE_DEBIAN ]]; then # DEB
-			make package
+			make -j$ISCORE_NUM_THREADS package
 
 			# Install
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
@@ -334,10 +350,10 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			echo "Warning : no suitable packaging method found. Please package Jamoma yourself or run make install."
 		fi
 	elif [[ "$OSTYPE" == "android" ]]; then # Android
-		make
+		make -j$ISCORE_NUM_THREADS
 		sudo cp *.so /opt/android-toolchain/arm-linux-androideabi/lib/jamoma
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		make install
+		make -j$ISCORE_NUM_THREADS install
 	else
 		echo "Not supported yet."
 	fi
@@ -354,12 +370,12 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd $ISCORE_FOLDER
 
 		if [[ $ISCORE_RECAST ]]; then
-			${qmake5} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			make
+			${qmake5} ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			make -j$ISCORE_NUM_THREADS
 			cp i-scoreRecast ../../i-score0.3
 		else
 			${qmake4} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			make
+			make -j$ISCORE_NUM_THREADS
 			cp i-score ../../i-score0.2
 		fi
 
@@ -372,7 +388,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 
 		echo "Using following NDK root : $ANDROID_NDK_ROOT."
 		$ANDROID_QT_BIN/qmake -r $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG ../../$ISCORE_FOLDER/i-scoreNew.pro
-		make
+		make -j$ISCORE_NUM_THREADS
 		make install INSTALL_ROOT=android_build_output
 		$ANDROID_QT_BIN/androiddeployqt --output android_build_output --input android-libi-scoreRecast.so-deployment-settings.json
 
@@ -382,8 +398,12 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd ..
 		mkdir $ISCORE_FOLDER
 		cd $ISCORE_FOLDER
-		qmake ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-		make
+		if [[ $ISCORE_RECAST ]]; then
+			qmake ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+		else
+			qmake ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+		fi
+		make -j$ISCORE_NUM_THREADS
 
 		cd ../..
 		if [[ $ISCORE_RECAST ]]; then
