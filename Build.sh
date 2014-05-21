@@ -389,11 +389,11 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		if [[ $ISCORE_RECAST ]]; then
 			ISCORE_EXECUTABLE_NAME=i-score0.3
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
-			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app .
+			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app $ISCORE_EXECUTABLE_NAME.app
 		else
 			ISCORE_EXECUTABLE_NAME=i-score0.2
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
-			cp -rf build/$ISCORE_FOLDER/i-score.app .
+			cp -rf build/$ISCORE_FOLDER/i-score.app $ISCORE_EXECUTABLE_NAME.app
 		fi
 
 		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
