@@ -356,11 +356,11 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		if [[ $ISCORE_RECAST ]]; then
 			${qmake5} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make
-			cp i-scoreRecast ../../i-score
+			cp i-scoreRecast ../../i-score0.3
 		else
 			${qmake4} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make
-			cp i-score ../../i-score
+			cp i-score ../../i-score0.2
 		fi
 
 
@@ -387,13 +387,15 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 
 		cd ../..
 		if [[ $ISCORE_RECAST ]]; then
-			ISCORE_EXECUTABLE_NAME=i-scoreRecast
+			ISCORE_EXECUTABLE_NAME=i-score0.3
+			rm -rf $ISCORE_EXECUTABLE_NAME.app
+			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app .
 		else
-			ISCORE_EXECUTABLE_NAME=i-score
+			ISCORE_EXECUTABLE_NAME=i-score0.2
+			rm -rf $ISCORE_EXECUTABLE_NAME.app
+			cp -rf build/$ISCORE_FOLDER/i-score.app .
 		fi
 
-		rm -rf $ISCORE_EXECUTABLE_NAME.app
-		cp -rf build/$ISCORE_FOLDER/$ISCORE_EXECUTABLE_NAME.app .
 		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
 		cp -rf /usr/local/jamoma* $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
 
