@@ -11,11 +11,14 @@ Please refer to the additional notes prior to running the commands.
 
 # Setup 
 ### (Requires brew / macports on OS X)
+(see instructions below to install brew for OSX)
+
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
     
-Which will create an i-score0.2 executable file on Linux, and an i-score0.2.app on OS X.
+Which will clone several repositories (Jamoma, Jamoma/Core and i-score) as sub-folders of this repository's folder
+and will create an i-score0.2 executable file on Linux, and an i-score0.2.app on OS X.
 
 If you want to try the next version of i-score (0.3), which is only at the prototype state run : 
 
