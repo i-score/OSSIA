@@ -11,6 +11,8 @@ Please refer to the additional notes prior to running the commands.
 
 # Setup 
 ### (Requires brew / macports on OS X)
+(see instructions below to install brew for OSX)
+
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
