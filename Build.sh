@@ -261,7 +261,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		if [[ $ISCORE_FEDORA ]]; then
 			qmake4=qmake-qt4
 			qmake5=qmake-qt5
-		elif command $qtchooser > /dev/null; then
+		elif command qtchooser > /dev/null; then
 			qmake4="qtchooser -run-tool=qmake -qt=qt4"
 			qmake5="qtchooser -run-tool=qmake -qt=qt5"
 		else
@@ -426,7 +426,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		else
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
-		fi			
+		fi
 	else
 		echo "System not supported yet."
 	fi
