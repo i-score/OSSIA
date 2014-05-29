@@ -69,3 +69,7 @@ In this case, the following packages must be installed manually from the Trusty 
     http://packages.ubuntu.com/trusty/libgecodeflatzinc36
     http://packages.ubuntu.com/trusty/libgecode-dev
 
+## Raspberry Pi setup
+From a new Raspbian installation, run the following command line to install needed package :
+`sudo apt-get update && sudo apt-get install -y cmake libxml2-dev libgecode-dev`
+
