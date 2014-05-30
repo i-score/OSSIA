@@ -33,8 +33,6 @@ Options :
 
 --jamoma-path=/some/path/to/Jamoma/Core folder
   Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
---classic (transitional)
-  Uses the ruby.rb script to build Jamoma.
 --debug
   Builds everything with debug informations.
 --use-clang
@@ -47,9 +45,19 @@ Options :
 
 --clean
   Removes the build folder.
+--uninstall
+  Will try to uninstall Jamoma.
 
 --help
   Shows this message
+
+===============
+
+Special options :
+--classic (transitional)
+  Uses the ruby.rb script to build Jamoma.
+--clean-classic
+  Cleans the dependencies and the files installed by the classic build.
 "
 
 if test $# -eq 0 ; then
@@ -89,12 +97,18 @@ do
 	--classic) echo "Will build using the Ruby script"
 		ISCORE_CLASSIC_BUILD=1
 		;;
+	--clean-classic) echo "Will clean the classic stuff"
+		ISCORE_CLEAN_CLASSIC_BUILD=1
+		;;
 	--jamoma-path=*)
 		ISCORE_JAMOMA_PATH=$(cd "${1#*=}"; pwd)
 		echo "Will use the Jamoma installation located in ${ISCORE_JAMOMA_PATH}"
 		;;
-	--multi) echo "Will build using every logical core"
+	--multi) echo "Will build using every logical core on the computer (faster)"
 		ISCORE_ENABLE_MULTICORE=1
+		;;
+	--uninstall) echo "Will uninstall Jamoma"
+		ISCORE_UNINSTALL_JAMOMA=1
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
@@ -118,8 +132,45 @@ do
 	shift
 done
 
+########## GENERAL CONFIG ##########
+###### Check of the Linux distribution ######
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	if [ -f /etc/fedora-release ] ; then # yum
+		ISCORE_FEDORA=1
+	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' ]]; then # apt
+		ISCORE_DEBIAN=1
+	fi
+fi
+
 ########## CLASSIC BUILD ###########
+# Cleaning
+if [[ $ISCORE_CLEAN_CLASSIC_BUILD ]]; then
+	echo "Removing classic build only."
+	echo "WARNING : Jamoma, Qt, Gecode and libXml will be removed, as they interfere with the one installed using a package manager like brew or macports."
+	read -p "Please confirm your intent by pressing 'y': " -n 1 -r
+	echo
+	if [[ $REPLY =~ ^[Yy]$ ]]
+	then
+		# Qt
+		sudo python /Developer/Tools/uninstall-qt.py
+
+		# Gecode
+		sudo rm -rf /Library/Frameworks/Gecode.framework /usr/local/bin/fz /usr/local/bin/mzn-gecode /usr/local/share/gecode
+
+		# libXml
+		sudo rm -rf /Library/Frameworks/libxml.framework
+
+		# Jamoma
+		sudo rm -rf /usr/local/jamoma /usr/local/lib/jamoma
+	fi
+
+	echo "Cleaning was successful."
+	exit 0
+fi
+
+# Building
 if [[ $ISCORE_CLASSIC_BUILD ]]; then
+	echo "Classic build only"
 	if [[ $ISCORE_INSTALL_DEPS ]]; then
 		## Qt ##
 		echo "Installing Qt..."
@@ -179,15 +230,27 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 	fi
 	exit 0
 fi
+
+#####################################
+######### Standard Build ############
 #####################################
 
-###### Check of the Linux distribution ######
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if [ -f /etc/fedora-release ] ; then # yum
-		ISCORE_FEDORA=1
-	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' ]]; then # apt
-		ISCORE_DEBIAN=1
+
+####### Uninstallation ? #############
+if [[ $ISCORE_UNINSTALL_JAMOMA ]];; then
+	if [[ $ISCORE_FEDORA ]]; then
+		su -c 'yum remove jamomacore'
+		sudo rm -rf /usr/lib/libJamoma*
+
+	elif [[ $ISCORE_DEBIAN ]]; then
+		sudo apt-get remove jamomacore
+		sudo rm -rf /usr/lib/libJamoma*
+
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		sudo rm -rf /usr/local/jamoma*
 	fi
+
+	exit 0
 fi
 
 ###### Build using all the cores ######
