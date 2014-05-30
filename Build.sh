@@ -234,18 +234,18 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			fi
 		fi
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		if command $brew > /dev/null; then # Brew
+		if command which brew; then # Brew
 			if [[ $ISCORE_RECAST ]]; then
 				brew install cmake gecode portaudio portmidi libsndfile qt5
 			else
 				brew install cmake gecode portaudio portmidi libsndfile qt
 			fi
 			brew link gecode
-		elif command $port > /dev/null; then # MacPorts
+		elif command which port; then # MacPorts
 			if [[ $ISCORE_RECAST ]]; then
-				port install cmake gecode portaudio portmidi libsndfile qt5
+				sudo port install cmake gecode portaudio portmidi libsndfile qt5 # AV : afaik there is no qt5 package in Macport
 			else
-				port install cmake gecode portaudio portmidi libsndfile qt
+				sudo port install cmake gecode portaudio portmidi libsndfile qt4-mac
 			fi
 		else
 			echo "Warning : --install-deps was specified but no suitable package manager was found.
@@ -261,7 +261,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 		if [[ $ISCORE_FEDORA ]]; then
 			qmake4=qmake-qt4
 			qmake5=qmake-qt5
-		elif command qtchooser > /dev/null; then
+		elif command which qtchooser; then
 			qmake4="qtchooser -run-tool=qmake -qt=qt4"
 			qmake5="qtchooser -run-tool=qmake -qt=qt5"
 		else
