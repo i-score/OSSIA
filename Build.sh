@@ -302,7 +302,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 		git clone -b feature/cmake https://github.com/OSSIA/Score.git JamomaCore/Score $ISCORE_DEPTH_GIT
 		export ISCORE_JAMOMA_PATH=`pwd`/JamomaCore
 	fi
-	export JAMOMA_INCLUDE_PATH=$ISCORE_JAMOMA_PATH
+
 
 	# i-score
 	if [[ $ISCORE_RECAST ]]; then
@@ -322,11 +322,19 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	fi
 fi
 
+
+##### Build Jamoma #####
+# Path setting
+if [[ ! $ISCORE_JAMOMA_PATH ]]; then
+	export ISCORE_JAMOMA_PATH=`pwd`/JamomaCore
+fi
+export JAMOMA_INCLUDE_PATH=$ISCORE_JAMOMA_PATH
+
 # Create build folders
 mkdir -p build/jamoma
 cd build/jamoma
 
-##### Build Jamoma #####
+# Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	cmake $ISCORE_JAMOMA_PATH $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 
