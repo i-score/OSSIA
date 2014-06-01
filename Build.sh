@@ -14,7 +14,7 @@ Builds Jamoma, Score, and i-score 0.2, 0.3 on Linux and OS X systems.
 
 Software :
 iscore
-  Builds (not installs, yet) i-score.
+  Builds (not yet installs) i-score.
 
 iscore-recast
   Builds i-score 0.3 instead of 0.2. Overrides iscore.
@@ -44,7 +44,7 @@ Options :
   To cross-build, please set ANDROID_NDK_ROOT to your NDK path and ANDROID_QT_BIN to the corresponding qmake executable folder.
 
 --clean
-  Removes the build folder.
+  Removes the build folder and the executables prior to building.
 --uninstall
   Will try to uninstall Jamoma.
 
@@ -53,11 +53,18 @@ Options :
 
 ===============
 
-Special options :
+Classic mode options :
 --classic (transitional)
   Uses the ruby.rb script to build Jamoma.
 --clean-classic
   Cleans the dependencies and the files installed by the classic build.
+
+Note: in this mode, only the following options are effective:
+jamoma
+iscore
+--clone
+--install-deps
+--jamoma-path
 "
 
 if test $# -eq 0 ; then
@@ -195,18 +202,18 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 	fi
 
 	if [[ $ISCORE_JAMOMA_PATH ]]; then
-		export ISCORE_SCORE_PATH=$ISCORE_JAMOMA_PATH/Score
+		export ISCORE_SCORE_PATH=$ISCORE_JAMOMA_PATH/Core/Score
 	else
 		export ISCORE_SCORE_PATH=`pwd`/Score
 	fi
 
 	if [[ $ISCORE_CLONE_GIT ]]; then
 		if [[ $ISCORE_JAMOMA_PATH ]]; then
-			if [[ -e $ISCORE_JAMOMA_PATH/Score ]]; then
+			if [[ -e $ISCORE_SCORE_PATH ]]; then
 				echo "Will build using the existing Jamoma & Score installations"
 			else
 				echo "Will clone Score in the Jamoma/Core folder"
-				git clone https://github.com/OSSIA/Score $ISCORE_JAMOMA_PATH/Score
+				git clone https://github.com/OSSIA/Score $ISCORE_SCORE_PATH
 			fi
 		else
 			git clone https://github.com/OSSIA/Score
@@ -237,7 +244,7 @@ fi
 
 
 ####### Uninstallation ? #############
-if [[ $ISCORE_UNINSTALL_JAMOMA ]];; then
+if [[ $ISCORE_UNINSTALL_JAMOMA ]]; then
 	if [[ $ISCORE_FEDORA ]]; then
 		su -c 'yum remove jamomacore'
 		sudo rm -rf /usr/lib/libJamoma*
@@ -345,9 +352,9 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	export GIT_SSL_NO_VERIFY=1
 
 	if [[ $ISCORE_JAMOMA_PATH ]]; then
-		if [[ -e $ISCORE_JAMOMA_PATH/CMakeLists.txt ]]; then
-			if [[ -e $ISCORE_JAMOMA_PATH/Score ]]; then
-				if [[ -e $ISCORE_JAMOMA_PATH/Score/CMakeLists.txt ]]; then
+		if [[ -e $ISCORE_JAMOMA_PATH/Core/CMakeLists.txt ]]; then
+			if [[ -e $ISCORE_JAMOMA_PATH/Core/Score ]]; then
+				if [[ -e $ISCORE_JAMOMA_PATH/Core/Score/CMakeLists.txt ]]; then
 					echo "Building using the existing installation"
 				else
 					echo "Please switch OSSIA/Score to the feature/cmake branch"
@@ -361,9 +368,10 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 			exit 1
 		fi
 	else
-		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git $ISCORE_DEPTH_GIT
-		git clone -b feature/cmake https://github.com/OSSIA/Score.git JamomaCore/Score $ISCORE_DEPTH_GIT
-		export ISCORE_JAMOMA_PATH=`pwd`/JamomaCore
+		git clone https://github.com/Jamoma/Jamoma
+		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
+		git clone -b feature/cmake https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
+		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
 	fi
 
 
@@ -375,13 +383,9 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
-		cd JamomaCore
-		git fetch
-		cd Score
-		git fetch
-		cd ../../$ISCORE_FOLDER
-		git fetch
-		cd ..
+		(cd $ISCORE_JAMOMA_PATH/Core; git fetch --all)
+		(cd $ISCORE_JAMOMA_PATH/Core/Score; git fetch --all)
+		(cd $ISCORE_FOLDER; git fetch --all)
 	fi
 fi
 
@@ -389,9 +393,9 @@ fi
 ##### Build Jamoma #####
 # Path setting
 if [[ ! $ISCORE_JAMOMA_PATH ]]; then
-	export ISCORE_JAMOMA_PATH=`pwd`/JamomaCore
+	export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
 fi
-export JAMOMA_INCLUDE_PATH=$ISCORE_JAMOMA_PATH
+export JAMOMA_INCLUDE_PATH=$ISCORE_JAMOMA_PATH/Core
 
 # Create build folders
 mkdir -p build/jamoma
@@ -399,7 +403,7 @@ cd build/jamoma
 
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-	cmake $ISCORE_JAMOMA_PATH $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+	cmake $ISCORE_JAMOMA_PATH/Core $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 
 	# Creation of Jamoma packages
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
