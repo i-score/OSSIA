@@ -274,15 +274,15 @@ fi
 ###### Set compiler toolchains ######
 if [[ $ISCORE_USE_CLANG ]]; then
 	if [[ "$OSTYPE" == "android"* ]]; then
-	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../JamomaCore/Shared/CMake/toolchains/android-clang.cmake"
+	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../Jamoma/Core/Shared/CMake/toolchains/android-clang.cmake"
 	ISCORE_QMAKE_TOOLCHAIN="-spec android-clang"
 	elif [[ "$OSTYPE" != "darwin"* ]]; then
-	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../JamomaCore/Shared/CMake/toolchains/linux-clang.cmake"
+	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../Jamoma/Core/Shared/CMake/toolchains/linux-clang.cmake"
 	ISCORE_QMAKE_TOOLCHAIN="-spec unsupported/linux-clang"
 	fi
 else
 	if [[ "$OSTYPE" == "android"* ]]; then
-	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../JamomaCore/Shared/CMake/toolchains/android-gcc.cmake"
+	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../Jamoma/Core/Shared/CMake/toolchains/android-gcc.cmake"
 	ISCORE_QMAKE_TOOLCHAIN="-spec android-g++"
 	fi
 fi
