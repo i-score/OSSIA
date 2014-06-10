@@ -144,7 +144,7 @@ done
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	if [ -f /etc/fedora-release ] ; then # yum
 		ISCORE_FEDORA=1
-	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' ]]; then # apt
+	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' || `lsb_release -si` = 'LinuxMint' ]]; then # apt
 		ISCORE_DEBIAN=1
 	fi
 fi
