@@ -218,10 +218,10 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 		else
 			git clone https://github.com/OSSIA/Score
 		fi
-		(cd $ISCORE_SCORE_PATH; git checkout dev)
+		(cd $ISCORE_SCORE_PATH; git checkout feature/api)
 
 		git clone https://github.com/i-score/i-score i-score
-		(cd i-score; git checkout dev)
+		(cd i-score; git checkout feature/api)
 	fi
 
 	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
