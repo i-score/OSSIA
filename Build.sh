@@ -302,11 +302,13 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			cd build;
 			cmake -DBUILD_SHARED_LIBS:BOOL=ON -DGECODE_USE_QT:BOOL=FALSE ..;
 			make -j$ISCORE_NUM_THREADS;
-			sudo cp *.so /usr/local/lib/;
 			mkdir tmp_folder;
+
 			cp --parents `find ../gecode -name \*.hpp` tmp_folder;
 			cp --parents `find ../gecode -name \*.hh` tmp_folder;
-			sudo cp -rf gecode /usr/local/include;
+			
+			sudo cp -rf gecode /usr/include;
+			sudo cp *.so /usr/lib/;
 		)
 
 		if [[ $ISCORE_FEDORA ]]; then
