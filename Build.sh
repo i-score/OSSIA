@@ -278,7 +278,7 @@ if [[ $ISCORE_USE_CLANG ]]; then
 	ISCORE_QMAKE_TOOLCHAIN="-spec android-clang"
 	elif [[ "$OSTYPE" != "darwin"* ]]; then
 	ISCORE_CMAKE_TOOLCHAIN="-DCMAKE_TOOLCHAIN_FILE=../../Jamoma/Core/Shared/CMake/toolchains/linux-clang.cmake"
-	ISCORE_QMAKE_TOOLCHAIN="-spec unsupported/linux-clang"
+	ISCORE_QMAKE_TOOLCHAIN="-spec linux-clang"
 	fi
 else
 	if [[ "$OSTYPE" == "android"* ]]; then
@@ -290,33 +290,18 @@ fi
 ###### Install dependencies ######
 if [[ $ISCORE_INSTALL_DEPS ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
-		if [[ $ISCORE_RECAST ]]; then # Install dependencies required for iscore 0.3
-			if [[ $ISCORE_FEDORA ]]; then
-				su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
-			elif [[ $ISCORE_DEBIAN ]]; then
-				sudo apt-get install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
-			fi
-		else								 # Install dependencies required for iscore 0.2
-			if [[ $ISCORE_FEDORA ]]; then
-				su -c 'yum install cmake git qt qt-devel gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
-			elif [[ $ISCORE_DEBIAN ]]; then
-				sudo apt-get install g++ qtchooser cmake git libqt4-dev qt4-qmake libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev git clang-3.4 cmake libstdc++-4.8-dev libc++-dev
-			fi
+		if [[ $ISCORE_FEDORA ]]; then
+			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
+		elif [[ $ISCORE_DEBIAN ]]; then
+			sudo apt-get install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
 		fi
+
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
-			if [[ $ISCORE_RECAST ]]; then
-				brew install cmake gecode portaudio portmidi libsndfile qt5
-			else
-				brew install cmake gecode portaudio portmidi libsndfile qt
-			fi
+			brew install cmake gecode portaudio portmidi libsndfile qt5
 			brew link gecode
 		elif command which port; then # MacPorts
-			if [[ $ISCORE_RECAST ]]; then
-				sudo port install cmake gecode portaudio portmidi libsndfile qt5 # AV : afaik there is no qt5 package in Macport
-			else
-				sudo port install cmake gecode portaudio portmidi libsndfile qt4-mac
-			fi
+			sudo port install cmake gecode portaudio portmidi libsndfile qt5 # AV : afaik there is no qt5 package in Macport
 		else
 			echo "Warning : --install-deps was specified but no suitable package manager was found.
 				  Please install Homebrew or Macports."
@@ -326,18 +311,13 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 fi
 
 ###### Configure qmake ######
+ISCORE_QMAKE=qmake
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	if [[ -z $ISCORE_QMAKE ]]; then
 		if [[ $ISCORE_FEDORA ]]; then
-			qmake4=qmake-qt4
-			qmake5=qmake-qt5
+			ISCORE_QMAKE=qmake-qt5
 		elif command which qtchooser; then
-			qmake4="qtchooser -run-tool=qmake -qt=qt4"
-			qmake5="qtchooser -run-tool=qmake -qt=qt5"
-		else
-			echo "Warning : could not differenciate between Qt4 and Qt5"
-			qmake4=qmake
-			qmake5=qmake
+			ISCORE_QMAKE="qtchooser -run-tool=qmake -qt=qt5"
 		fi
 	fi
 fi
@@ -379,7 +359,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
-		git clone -b dev https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+		git clone -b feature/api https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
@@ -445,11 +425,11 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd $ISCORE_FOLDER
 
 		if [[ $ISCORE_RECAST ]]; then
-			${qmake5} ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make -j$ISCORE_NUM_THREADS
 			cp i-scoreRecast ../../i-score0.3
 		else
-			${qmake4} ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make -j$ISCORE_NUM_THREADS
 			cp i-score ../../i-score0.2
 		fi
@@ -474,9 +454,9 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		mkdir $ISCORE_FOLDER
 		cd $ISCORE_FOLDER
 		if [[ $ISCORE_RECAST ]]; then
-			qmake ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		else
-			qmake ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		fi
 		make -j$ISCORE_NUM_THREADS
 
