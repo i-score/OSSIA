@@ -229,10 +229,10 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 		else
 			git clone https://github.com/OSSIA/Score
 		fi
-		(cd $ISCORE_SCORE_PATH; git checkout feature/api)
+		(cd $ISCORE_SCORE_PATH; git checkout dev)
 
 		git clone https://github.com/i-score/i-score i-score
-		(cd i-score; git checkout feature/api)
+		(cd i-score; git checkout feature/qt5)
 	fi
 
 	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
@@ -334,16 +334,15 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 fi
 
 ###### Configure qmake ######
-ISCORE_QMAKE=qmake
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	if [[ -z $ISCORE_QMAKE ]]; then
-		if [[ $ISCORE_FEDORA ]]; then
-			ISCORE_QMAKE=qmake-qt5
-		elif command which qtchooser; then
-			ISCORE_QMAKE="qtchooser -run-tool=qmake -qt=qt5"
-		fi
-	fi
-fi
+ISCORE_QMAKE=/home/doom/Qt5.3.1/5.3/gcc_64/bin/qmake
+#
+#if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+#	if [[ $ISCORE_FEDORA ]]; then
+#		ISCORE_QMAKE=qmake-qt5
+#	elif command which qtchooser; then
+#		ISCORE_QMAKE="qtchooser -run-tool=qmake -qt=qt5"
+#	fi
+#fi
 
 ########################################
 #####         Installation         #####
@@ -382,7 +381,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
-		git clone -b feature/api https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+		git clone -b feature/qt5 https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
