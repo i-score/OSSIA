@@ -149,6 +149,17 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	fi
 fi
 
+###### Build using all the cores ######
+if [[ $ISCORE_ENABLE_MULTICORE ]]; then
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		ISCORE_NUM_THREADS=`nproc`
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		ISCORE_NUM_THREADS=`sysctl -n hw.ncpu`
+	fi
+else
+	ISCORE_NUM_THREADS=1
+fi
+
 ########## CLASSIC BUILD ###########
 # Cleaning
 if [[ $ISCORE_CLEAN_CLASSIC_BUILD ]]; then
@@ -260,16 +271,7 @@ if [[ $ISCORE_UNINSTALL_JAMOMA ]]; then
 	exit 0
 fi
 
-###### Build using all the cores ######
-if [[ $ISCORE_ENABLE_MULTICORE ]]; then
-	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-		ISCORE_NUM_THREADS=`nproc`
-	elif [[ "$OSTYPE" == "darwin"* ]]; then
-		ISCORE_NUM_THREADS=`sysctl -n hw.ncpu`
-	fi
-else
-	ISCORE_NUM_THREADS=1
-fi
+
 
 ###### Set compiler toolchains ######
 if [[ $ISCORE_USE_CLANG ]]; then
@@ -290,11 +292,30 @@ fi
 ###### Install dependencies ######
 if [[ $ISCORE_INSTALL_DEPS ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
+
+		# To prevent incompatibilities with distribution packages which might ship a Gecode which links against qt4, we build our own.
+		wget http://www.gecode.org/download/gecode-4.3.0.tar.gz
+		tar -zxf gecode-4.3.0.tar.gz
+		(
+			cd gecode-4.3.0;
+			mkdir build;
+			cd build;
+			cmake -DBUILD_SHARED_LIBS:BOOL=ON -DGECODE_USE_QT:BOOL=FALSE ..;
+			make -j$ISCORE_NUM_THREADS;
+			sudo cp *.so /usr/local/lib/;
+			mkdir tmp_folder;
+			cp --parents `find ../gecode -name \*.hpp` tmp_folder;
+			cp --parents `find ../gecode -name \*.hh` tmp_folder;
+			sudo cp -rf gecode /usr/local/include;
+		)
+
 		if [[ $ISCORE_FEDORA ]]; then
 			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
 		elif [[ $ISCORE_DEBIAN ]]; then
-			sudo apt-get install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libgecode-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
+			sudo apt-get install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
 		fi
+
+
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
