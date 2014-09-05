@@ -333,15 +333,15 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 fi
 
 ###### Configure qmake ######
-ISCORE_QMAKE=/home/doom/Qt5.3.1/5.3/gcc_64/bin/qmake
-#
-#if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-#	if [[ $ISCORE_FEDORA ]]; then
-#		ISCORE_QMAKE=qmake-qt5
-#	elif command which qtchooser; then
-#		ISCORE_QMAKE="qtchooser -run-tool=qmake -qt=qt5"
-#	fi
-#fi
+ISCORE_QMAKE=qmake
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+	if [[ $ISCORE_FEDORA ]]; then
+		ISCORE_QMAKE=qmake-qt5
+	elif command which qtchooser; then
+		ISCORE_QMAKE="qtchooser -run-tool=qmake -qt=qt5"
+	fi
+fi
 
 ########################################
 #####         Installation         #####
