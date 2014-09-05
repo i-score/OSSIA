@@ -371,7 +371,9 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	else
 		git clone https://github.com/Jamoma/Jamoma
 		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
+		git clone -b dev https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT
 		git clone -b feature/cmake https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
+		
 		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
 	fi
 
@@ -386,6 +388,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_FETCH_GIT ]]; then
 		(cd $ISCORE_JAMOMA_PATH/Core; git fetch --all)
 		(cd $ISCORE_JAMOMA_PATH/Core/Score; git fetch --all)
+		(cd $ISCORE_JAMOMA_PATH/Implementations/Max; git fetch --all)
 		(cd $ISCORE_FOLDER; git fetch --all)
 	fi
 fi
