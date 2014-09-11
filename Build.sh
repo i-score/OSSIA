@@ -373,7 +373,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
 		git clone -b dev https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT
 		git clone -b feature/cmake https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
-		
+
 		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
 	fi
 
@@ -486,18 +486,33 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 
 		cd ../..
 		if [[ $ISCORE_RECAST ]]; then
+			/usr/local/Cellar/qt5/5.3.1/bin/macdeployqt build/$ISCORE_FOLDER/i-scoreRecast.app
 			ISCORE_EXECUTABLE_NAME=i-score0.3
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
 			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app $ISCORE_EXECUTABLE_NAME.app
 		else
+			/usr/local/Cellar/qt5/5.3.1/bin/macdeployqt build/$ISCORE_FOLDER/i-score.app
 			ISCORE_EXECUTABLE_NAME=i-score0.2
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
 			cp -rf build/$ISCORE_FOLDER/i-score.app $ISCORE_EXECUTABLE_NAME.app
 		fi
 
-		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
-		cp -rf /usr/local/jamoma* $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
+		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/lib
+		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions
 
+
+		### Deployment ###
+		# Jamoma libs
+		declare -a jamomalibs=("Foundation" "Modular" "DSP" "Score")
+		declare -a jamomaexts=("Scenario" "Automation" "Interval" "OSC" "Minuit" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
+		for JAMOMA_LIB in "${jamomalibs[@]}"
+		do
+			cp -rf /usr/local/jamoma/lib/libJamoma$JAMOMA_LIB.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/lib/
+		done
+		for JAMOMA_EXT in "${jamomaexts[@]}"
+		do
+			cp -rf /usr/local/jamoma/extensions/$JAMOMA_EXT.ttdylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/
+		done
 		# Jamoma rpath
 		if [[ $ISCORE_RECAST ]]; then
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-scoreRecast
@@ -506,6 +521,14 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
 		fi
+
+		# Gecode linking
+		declare -a gecodelibs=("kernel" "support" "int" "set" "driver" "flatzinc" "minimodel" "search" "float")
+		for GECODE_LIB in "${gecodelibs[@]}"
+		do
+			install_name_tool -change /usr/local/lib/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
+		done
+
 	else
 		echo "System not supported yet."
 	fi
