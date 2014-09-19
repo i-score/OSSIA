@@ -409,7 +409,7 @@ cd build/jamoma
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	cmake $ISCORE_JAMOMA_PATH/Core $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
-	if [ $? -neq 0 ]; then
+	if [ $? -ne 0 ]; then
 		exit 1
 	fi
 
@@ -417,7 +417,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 		if [[ $ISCORE_FEDORA ]]; then # RPM
 			cpack -G RPM
-			if [ $? -neq 0 ]; then
+			if [ $? -ne 0 ]; then
 				exit 1
 			fi
 
@@ -427,7 +427,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 
 		elif [[ $ISCORE_DEBIAN ]]; then # DEB
 			make -j$ISCORE_NUM_THREADS package
-			if [ $? -neq 0 ]; then
+			if [ $? -ne 0 ]; then
 				exit 1
 			fi
 
@@ -443,7 +443,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		sudo cp *.so /opt/android-toolchain/arm-linux-androideabi/lib/jamoma
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		make -j$ISCORE_NUM_THREADS install
-		if [ $? -neq 0 ]; then
+		if [ $? -ne 0 ]; then
 			exit 1
 		fi
 	else
@@ -468,7 +468,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		else
 			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make -j$ISCORE_NUM_THREADS
-			if [ $? -neq 0 ]; then
+			if [ $? -ne 0 ]; then
 				exit 1
 			fi
 			cp i-score ../../i-score0.2
@@ -498,17 +498,17 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd $ISCORE_FOLDER
 		if [[ $ISCORE_RECAST ]]; then
 			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			if [ $? -neq 0 ]; then
+			if [ $? -ne 0 ]; then
 				exit 1
 			fi
 		else
 			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			if [ $? -neq 0 ]; then
+			if [ $? -ne 0 ]; then
 				exit 1
 			fi
 		fi
 		make -j$ISCORE_NUM_THREADS
-		if [ $? -neq 0 ]; then
+		if [ $? -ne 0 ]; then
 			exit 1
 		fi
 
