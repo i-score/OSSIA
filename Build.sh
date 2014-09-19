@@ -409,11 +409,17 @@ cd build/jamoma
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	cmake $ISCORE_JAMOMA_PATH/Core $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+	if [ $? -neq 0 ]; then
+		exit 1
+	fi
 
 	# Creation of Jamoma packages
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 		if [[ $ISCORE_FEDORA ]]; then # RPM
 			cpack -G RPM
+			if [ $? -neq 0 ]; then
+				exit 1
+			fi
 
 			# Install
 			su -c 'rpm -Uvh --force JamomaCore-0.6-dev-Linux.rpm'
@@ -421,6 +427,9 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 
 		elif [[ $ISCORE_DEBIAN ]]; then # DEB
 			make -j$ISCORE_NUM_THREADS package
+			if [ $? -neq 0 ]; then
+				exit 1
+			fi
 
 			# Install
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
@@ -434,6 +443,9 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		sudo cp *.so /opt/android-toolchain/arm-linux-androideabi/lib/jamoma
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		make -j$ISCORE_NUM_THREADS install
+		if [ $? -neq 0 ]; then
+			exit 1
+		fi
 	else
 		echo "Not supported yet."
 	fi
@@ -456,6 +468,9 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		else
 			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 			make -j$ISCORE_NUM_THREADS
+			if [ $? -neq 0 ]; then
+				exit 1
+			fi
 			cp i-score ../../i-score0.2
 		fi
 
@@ -483,10 +498,19 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cd $ISCORE_FOLDER
 		if [[ $ISCORE_RECAST ]]; then
 			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			if [ $? -neq 0 ]; then
+				exit 1
+			fi
 		else
 			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			if [ $? -neq 0 ]; then
+				exit 1
+			fi
 		fi
 		make -j$ISCORE_NUM_THREADS
+		if [ $? -neq 0 ]; then
+			exit 1
+		fi
 
 		cd ../..
 		if [[ $ISCORE_RECAST ]]; then
@@ -533,6 +557,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			install_name_tool -change /usr/local/lib/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
 		done
 
+		zip -r i-score0.2.zip $ISCORE_EXECUTABLE_NAME.app
 	else
 		echo "System not supported yet."
 	fi
