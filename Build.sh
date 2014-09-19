@@ -232,7 +232,7 @@ if [[ $ISCORE_CLASSIC_BUILD ]]; then
 		(cd $ISCORE_SCORE_PATH; git checkout dev)
 
 		git clone https://github.com/i-score/i-score i-score
-		(cd i-score; git checkout feature/qt5)
+		(cd i-score; git checkout dev)
 	fi
 
 	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
@@ -296,7 +296,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 		if [[ $ISCORE_FEDORA ]]; then
 			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
 		elif [[ $ISCORE_DEBIAN ]]; then
-			sudo apt-get install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
+			sudo apt-get -y install g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
 		fi
 
 		# To prevent incompatibilities with distribution packages which might ship a Gecode which links against qt4, we build our own.
@@ -322,6 +322,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 		if command which brew; then # Brew
 			brew install cmake gecode portaudio portmidi libsndfile qt5
 			brew link gecode
+			brew linkapps
 		elif command which port; then # MacPorts
 			sudo port install cmake gecode portaudio portmidi libsndfile qt5 # AV : afaik there is no qt5 package in Macport
 		else
@@ -382,7 +383,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
-		git clone -b feature/qt5 https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+		git clone -b dev https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
@@ -474,24 +475,27 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cp android_build_output/bin/QtApp-debug.apk ../../i-score-debug.apk
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+		ISCORE_QMAKE_BIN="$(find /usr/local/Cellar/qt5 -name qmake)"
+		ISCORE_QMAKE_BIN_PATH="$(dirname $ISCORE_QMAKE_BIN)"
+
 		cd ..
 		mkdir $ISCORE_FOLDER
 		cd $ISCORE_FOLDER
 		if [[ $ISCORE_RECAST ]]; then
-			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		else
-			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 		fi
 		make -j$ISCORE_NUM_THREADS
 
 		cd ../..
 		if [[ $ISCORE_RECAST ]]; then
-			/usr/local/Cellar/qt5/5.3.1/bin/macdeployqt build/$ISCORE_FOLDER/i-scoreRecast.app
+			$ISCORE_QMAKE_BIN_PATH/macdeployqt build/$ISCORE_FOLDER/i-scoreRecast.app
 			ISCORE_EXECUTABLE_NAME=i-score0.3
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
 			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app $ISCORE_EXECUTABLE_NAME.app
 		else
-			/usr/local/Cellar/qt5/5.3.1/bin/macdeployqt build/$ISCORE_FOLDER/i-score.app
+			$ISCORE_QMAKE_BIN_PATH/macdeployqt build/$ISCORE_FOLDER/i-score.app
 			ISCORE_EXECUTABLE_NAME=i-score0.2
 			rm -rf $ISCORE_EXECUTABLE_NAME.app
 			cp -rf build/$ISCORE_FOLDER/i-score.app $ISCORE_EXECUTABLE_NAME.app
