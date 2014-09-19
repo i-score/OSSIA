@@ -408,7 +408,7 @@ cd build/jamoma
 
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-	cmake $ISCORE_JAMOMA_PATH/Core $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 	if [ $? -ne 0 ]; then
 		exit 1
 	fi
