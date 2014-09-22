@@ -433,7 +433,6 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 
 			# Install
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
-			sudo ln -s /usr/local/lib/jamoma/lib/* -t /usr/lib
 
 		else
 			echo "Warning : no suitable packaging method found. Please package Jamoma yourself or run make install."

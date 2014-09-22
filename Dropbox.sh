@@ -12,7 +12,7 @@ fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	FOLDER="/home/ossia/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
-#	cp build/jamoma/Jamomacore-0.6-dev.deb $FOLDER
+#	cp build/jamoma/Jamomacore-0.6-dev-Linux.deb $FOLDER
 
 	tar -cJf i-score0.2.tar.xz i-score0.2
 #	cp i-score0.2 $FOLDER
