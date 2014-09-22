@@ -556,8 +556,6 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		do
 			install_name_tool -change /usr/local/lib/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
 		done
-
-		zip -r i-score0.2.zip $ISCORE_EXECUTABLE_NAME.app
 	else
 		echo "System not supported yet."
 	fi
