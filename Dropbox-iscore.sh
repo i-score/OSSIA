@@ -25,4 +25,4 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 ./tag.sh
-cp tag "$FOLDER"/
+cp tag "$FOLDER"/tag.txt
