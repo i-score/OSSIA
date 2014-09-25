@@ -8,9 +8,15 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	DISTROVERSION=$(cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d=)
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	DISTRO="OS X"
+	DISTROVERSION=""
 fi
 
+FOLDER="~/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	FOLDER="/home/ossia/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
-	cp build/jamoma/Jamomacore-0.6-dev-Linux.deb $FOLDER
+	cp Jamomacore-0.6-dev-Linux.deb $FOLDER
+
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+	cp JamomaCore-0.6-dev-Darwin.tar.gz $FOLDER
+	
 fi

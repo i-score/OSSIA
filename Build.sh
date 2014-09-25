@@ -27,6 +27,7 @@ Options :
   Clones the git repositories.
 --fetch-all
   Fetches the full git repositories instead of the tip of the feature/cmake branch. Useful for development.
+--master
 
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
@@ -432,7 +433,9 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			fi
 
 			# Install
+			sudo apt remove jamomacore
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
+			cp Jamomacore-0.6-dev-Linux.deb ../../
 
 		else
 			echo "Warning : no suitable packaging method found. Please package Jamoma yourself or run make install."
@@ -445,6 +448,13 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		if [ $? -ne 0 ]; then
 			exit 1
 		fi
+		
+		cpack -G TGZ
+		if [ $? -ne 0 ]; then
+			exit 1
+		fi
+
+		cp JamomaCore-0.6-dev-Darwin.tar.gz ../../
 	else
 		echo "Not supported yet."
 	fi
