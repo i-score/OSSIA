@@ -444,7 +444,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			# Install
 			sudo apt remove jamomacore
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
-			cp Jamomacore-0.6-dev-Linux.deb ../../
+			cp JamomaCore-0.6-dev-Linux.deb ../../
 
 		else
 			echo "Warning : no suitable packaging method found. Please package Jamoma yourself or run make install."
