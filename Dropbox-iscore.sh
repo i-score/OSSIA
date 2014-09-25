@@ -23,3 +23,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	cp i-score0.2.zip $FOLDER
 
 fi
+
+./tag.sh
+cp tag $FOLDER/
