@@ -15,7 +15,7 @@ FOLDER="$HOME/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
 mkdir -p "$FOLDER"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	cp Jamomacore-0.6-dev-Linux.deb "$FOLDER"
+	cp JamomaCore-0.6-dev-Linux.deb "$FOLDER"
 
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	cp JamomaCore-0.6-dev-Darwin.tar.gz "$FOLDER"
