@@ -9,6 +9,10 @@ ISCORE_QMAKE_TOOLCHAIN=""
 ISCORE_DEPTH_GIT="--depth=1"
 ISCORE_FOLDER="i-score"
 
+ISCORE_JAMOMA_BRANCH="feature/cmake"
+ISCORE_SCORE_BRANCH="feature/cmake"
+ISCORE_ISCORE_BRANCH="dev"
+
 HELP_MESSAGE="Usage : $(basename "$0") [software] [options]
 Builds Jamoma, Score, and i-score 0.2, 0.3 on Linux and OS X systems.
 
@@ -28,6 +32,7 @@ Options :
 --fetch-all
   Fetches the full git repositories instead of the tip of the feature/cmake branch. Useful for development.
 --master
+  Uses the master branch instead of the dev or feature/cmake branch
 
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
@@ -114,6 +119,10 @@ do
 		;;
 	--multi) echo "Will build using every logical core on the computer (faster)"
 		ISCORE_ENABLE_MULTICORE=1
+		;;
+	--master) echo "Using the master branch"
+		ISCORE_SCORE_BRANCH="master"
+		ISCORE_ISCORE_BRANCH="master"
 		;;
 	--uninstall) echo "Will uninstall Jamoma"
 		ISCORE_UNINSTALL_JAMOMA=1
@@ -364,7 +373,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 					exit 1
 				fi
 			else
-				git clone -b feature/cmake https://github.com/OSSIA/Score.git $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
+				git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
 			fi
 		else
 			echo "Please switch Jamoma/JamomaCore to the feature/cmake branch"
@@ -372,9 +381,9 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 		fi
 	else
 		git clone https://github.com/Jamoma/Jamoma
-		git clone -b feature/cmake https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
+		git clone -b $ISCORE_JAMOMA_BRANCH https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
 		git clone -b dev https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT
-		git clone -b feature/cmake https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
+		git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
 
 		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
 	fi
@@ -384,7 +393,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	if [[ $ISCORE_RECAST ]]; then
 		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
-		git clone -b dev https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+		git clone -b $ISCORE_ISCORE_BRANCH https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
 	fi
 
 	if [[ $ISCORE_FETCH_GIT ]]; then
