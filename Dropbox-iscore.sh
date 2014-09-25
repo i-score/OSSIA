@@ -11,18 +11,18 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	DISTROVERSION=""
 fi
 
-FOLDER="~/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
-mkdir -p $FOLDER
+FOLDER="$HOME/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
+mkdir -p "$FOLDER"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	tar -cJf i-score0.2.tar.xz i-score0.2
-	cp i-score0.2.tar.xz $FOLDER
+	cp i-score0.2.tar.xz "$FOLDER"
 	
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	zip -r i-score0.2.zip i-score0.2.app
-	cp i-score0.2.zip $FOLDER
+	cp i-score0.2.zip "$FOLDER"
 
 fi
 
 ./tag.sh
-cp tag $FOLDER/
+cp tag "$FOLDER"/
