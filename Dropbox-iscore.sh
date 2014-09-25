@@ -11,14 +11,13 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-	FOLDER="/home/ossia/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
-#	cp build/jamoma/Jamomacore-0.6-dev-Linux.deb $FOLDER
+	FOLDER="~/Dropbox/Iscore/Releases/$DISTRO$DISTROVERSION/$ARCH"
 
 	tar -cJf i-score0.2.tar.xz i-score0.2
-#	cp i-score0.2 $FOLDER
+	cp i-score0.2 $FOLDER
 	
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	zip -r i-score0.2.zip $ISCORE_EXECUTABLE_NAME.app
-	cp i-score0.2.zip "/Users/jcelerier/Dropbox/Iscore/Releases/$DISTRO/"
+	cp i-score0.2.zip "~/Dropbox/Iscore/Releases/$DISTRO/"
 
 fi
