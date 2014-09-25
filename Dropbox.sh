@@ -19,6 +19,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	zip -r i-score0.2.zip $ISCORE_EXECUTABLE_NAME.app
-	cp i-score0.2.zip "/Users/OSSIA/Dropbox/Iscore/Releases/$DISTRO/"
+	cp i-score0.2.zip "/Users/jcelerier/Dropbox/Iscore/Releases/$DISTRO/"
 
 fi
