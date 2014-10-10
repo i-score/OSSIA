@@ -550,7 +550,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		### Deployment ###
 		# Jamoma libs
 		declare -a jamomalibs=("Foundation" "Modular" "DSP" "Score")
-		declare -a jamomaexts=("Scenario" "Automation" "Interval" "OSC" "Minuit" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
+		declare -a jamomaexts=("Scenario" "Automation" "Interval" "OSC" "Minuit" "MIDI" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
 		for JAMOMA_LIB in "${jamomalibs[@]}"
 		do
 			cp -rf /usr/local/jamoma/lib/libJamoma$JAMOMA_LIB.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/lib/
