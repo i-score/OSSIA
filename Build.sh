@@ -568,6 +568,10 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
 		fi
 
+		# Portmidi
+		cp -rf /usr/local/lib/libportmidi.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
+		install_name_tool -change /usr/local/lib/libportmidi.dylib @executable_path/../Frameworks/libportmidi.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/MIDI.ttdylib
+
 		# Gecode linking
 		declare -a gecodelibs=("kernel" "support" "int" "set" "driver" "flatzinc" "minimodel" "search" "float")
 		for GECODE_LIB in "${gecodelibs[@]}"
