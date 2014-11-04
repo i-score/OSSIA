@@ -491,6 +491,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			exit 1
 		fi
 		make package
+		cp i-score-0.2.2-Linux.deb ../..
 		
 #		if [[ $ISCORE_RECAST ]]; then
 #			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
