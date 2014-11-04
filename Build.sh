@@ -473,24 +473,37 @@ fi
 ##### Build i-score #####
 if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
+		#
+		(
+			cd ../../$ISCORE_FOLDER/;
+			wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
+			unzip installer_data.zip -d installer_data;
+		)
 		# Build i-score
 		cd ..
 		mkdir $ISCORE_FOLDER
 
 		cd $ISCORE_FOLDER
 
-		if [[ $ISCORE_RECAST ]]; then
-			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			make -j$ISCORE_NUM_THREADS
-			cp i-scoreRecast ../../i-score0.3
-		else
-			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			make -j$ISCORE_NUM_THREADS
-			if [ $? -ne 0 ]; then
-				exit 1
-			fi
-			cp i-score ../../i-score0.2
+		cmake ../../$ISCORE_FOLDER -DCMAKE_BUILD_TYPE=Release
+		make -j$ISCORE_NUM_THREADS
+		if [ $? -ne 0 ]; then
+			exit 1
 		fi
+		make package
+		
+#		if [[ $ISCORE_RECAST ]]; then
+#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+#			make -j$ISCORE_NUM_THREADS
+#			cp i-scoreRecast ../../i-score0.3
+#		else
+#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
+#			make -j$ISCORE_NUM_THREADS
+#			if [ $? -ne 0 ]; then
+#				exit 1
+#			fi
+#			cp i-score ../../i-score0.2
+#		fi
 
 
 	elif [[ "$OSTYPE" == "android" ]]; then # Android
