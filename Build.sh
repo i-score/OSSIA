@@ -457,7 +457,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		if [ $? -ne 0 ]; then
 			exit 1
 		fi
-		
+
 		cpack -G TGZ
 		if [ $? -ne 0 ]; then
 			exit 1
@@ -492,7 +492,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		fi
 		make package
 		cp i-score-0.2.2-Linux.deb ../..
-		
+
 #		if [[ $ISCORE_RECAST ]]; then
 #			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
 #			make -j$ISCORE_NUM_THREADS
@@ -522,6 +522,38 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cp android_build_output/bin/QtApp-debug.apk ../../i-score-debug.apk
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
+    echo "------- BUILDING ISCORE --------"
+    cd ..
+    mkdir $ISCORE_FOLDER
+    cd $ISCORE_FOLDER
+
+    ISCORE_CMAKE_QT_CONFIG="$(find /usr/local/Cellar/qt5 -name Qt5Config.cmake)"
+    ISCORE_CMAKE_QT_PATH="$(dirname $ISCORE_CMAKE_QT_CONFIG)"
+    (
+      cd ../../$ISCORE_FOLDER/;
+      if [[ ! -f installer_data.zip ]]; then
+        wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
+        unzip installer_data.zip -d installer_data;
+      fi
+    )
+
+
+    cmake ../../$ISCORE_FOLDER -DCMAKE_PREFIX_PATH="$ISCORE_CMAKE_QT_PATH;/usr/local/jamoma/lib" -DCMAKE_BUILD_TYPE=Release
+    make -j$ISCORE_NUM_THREADS
+    if [ $? -ne 0 ]; then
+      exit 1
+    fi
+
+    make package
+    cp i-score.dmg ../..
+    exit 0
+
+
+
+
+
+
+    ####################
 		ISCORE_QMAKE_BIN="$(find /usr/local/Cellar/qt5 -name qmake)"
 		ISCORE_QMAKE_BIN_PATH="$(dirname $ISCORE_QMAKE_BIN)"
 
