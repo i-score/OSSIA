@@ -37,9 +37,9 @@ So if you want to develop, please add the `--fetch-all` command.
     
 where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
 
-The script makes some folder like `i-score` and `Jamoma` which are clones of git repositories.
+The script makes some folders like `i-score` and `Jamoma` which are clones of git repositories.
 To build a particular version, checkout the version you need in the corresponding folder.
-Then run make in the `buil/[project_folder]`.
+Then run `make` in the `build/[project_folder]`.
 For example to build i-score from the top of the `release/0.2` branch :
 
 ~~~~
