@@ -36,6 +36,20 @@ So if you want to develop, please add the `--fetch-all` command.
     ./Build.sh [name]
     
 where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
+
+The script makes some folder like `i-score` and `Jamoma` which are clones of git repositories.
+To build a particular version, checkout the version you need in the corresponding folder.
+Then run make in the `buil/[project_folder]`.
+For example to build i-score from the top of the `release/0.2` branch :
+
+~~~~
+cd i-score
+git fetch --all # if you didn't run ./Build.sh with --fetch-all option
+git checkout release/0.2 # to switch to the branch
+git pull origin release/0.2 # to update the branch with latest repo changes
+cd ../build/i-score
+make
+~~~~
     
 ## Old setup (Mac OS X only, doesn't require brew / macports)
 Follow this if you already have some parts of the OSSIA project on your computer.
