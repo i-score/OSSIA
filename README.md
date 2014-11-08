@@ -8,7 +8,8 @@ Every command are detailed when called with `--help`.
 
 They were tested on Mac OS X 10.9, Win8, Debian Jessie, Fedora 19, Ubuntu 14.04 and Ubuntu 13.10.
 Please refer to the additional notes prior to running the commands.
-Required OS versions: MacOS 10.7 and above, Win7 and above.
+
+Required OS versions: MacOS 10.7 and above, Win7 and above, Ubuntu 14.04 and above.
 
 # Setup 
 ### (Requires brew / macports on OS X)
