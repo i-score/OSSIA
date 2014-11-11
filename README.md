@@ -6,8 +6,10 @@ The base repository for the OSSIA project. Contains initialization and build scr
 For now, there is a build script that works for Unix OSes.
 Every command are detailed when called with `--help`.
 
-They were tested on Mac OS X 10.9, Debian Jessie, Fedora 19, Ubuntu 14.04 and Ubuntu 13.10.
+They were tested on Mac OS X 10.9, Win8, Debian Jessie, Fedora 19, Ubuntu 14.04 and Ubuntu 13.10.
 Please refer to the additional notes prior to running the commands.
+
+Required OS versions: MacOS 10.7 and above, Win7 and above, Ubuntu 14.04 and above.
 
 # Setup 
 ### (Requires brew / macports on OS X)
@@ -19,6 +21,7 @@ If you want to try the current i-score release quickly, run :
     
 Which will clone several repositories (Jamoma, Jamoma/Core and i-score) as sub-folders of this repository's folder
 and will create an i-score0.2 executable file on Linux, and an i-score0.2.app on OS X.
+This (with the --install-deps option) will also install all dependencies, including Qt5, gecode and others…
 
 If you want to try the next version of i-score (0.3), which is only at the prototype state run : 
 
@@ -38,6 +41,20 @@ Then to update to the latest Git commit, please use the `./Update.sh` script.
     ./Build.sh [name]
     
 where name can be either `jamoma`, `iscore` or `iscore-recast`. More to be added.
+
+The script makes some folders like `i-score` and `Jamoma` which are clones of git repositories.
+To build a particular version, checkout the version you need in the corresponding folder.
+Then run `make` in the `build/[project_folder]`.
+For example to build i-score from the top of the `release/0.2` branch :
+
+~~~~
+cd i-score
+git fetch --all # if you didn't run ./Build.sh with --fetch-all option
+git checkout release/0.2 # to switch to the branch
+git pull origin release/0.2 # to update the branch with latest repo changes
+cd ../build/i-score
+make
+~~~~
     
 ## Old setup (Mac OS X only, doesn't require brew / macports)
 Follow this if you already have some parts of the OSSIA project on your computer.
@@ -59,7 +76,7 @@ On OS X, due to the lack of package manager, make install is called. However, a 
 ## Installing brew on Mac OS X
 To install brew, run in a terminal : 
 
-    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 ## Missing packages on ubuntu 13.10
 In this case, the following packages must be installed manually from the Trusty archive in this order: 
