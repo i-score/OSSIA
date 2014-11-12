@@ -304,9 +304,9 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then # Desktop & Embedded Linux
 
 		if [[ $ISCORE_FEDORA ]]; then
-			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel'
+			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel wget'
 		elif [[ $ISCORE_DEBIAN ]]; then
-			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev
+			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev wget
 		fi
 
 		# To prevent incompatibilities with distribution packages which might ship a Gecode which links against qt4, we build our own.
@@ -330,11 +330,11 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
-			brew install cmake gecode portaudio portmidi libsndfile qt5
+			brew install cmake gecode portaudio portmidi libsndfile qt5 wget
 			brew link gecode
 			brew linkapps
 		elif command which port; then # MacPorts
-			sudo port install cmake gecode portaudio portmidi libsndfile qt5 # AV : afaik there is no qt5 package in Macport
+			sudo port install cmake gecode portaudio portmidi libsndfile qt5-mac wget
 		else
 			echo "Warning : --install-deps was specified but no suitable package manager was found.
 				  Please install Homebrew or Macports."
