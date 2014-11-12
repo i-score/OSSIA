@@ -34,6 +34,8 @@ In the name of quickness, the commands only fetch the latest git commits, which 
 
 So if you want to develop, please add the `--fetch-all` command.
 
+Then to update to the latest Git commit, please use the `./Update.sh` script.
+
 # Build
 
     ./Build.sh [name]
