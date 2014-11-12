@@ -330,6 +330,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
+			brew update
 			brew install cmake gecode portaudio portmidi libsndfile qt5 wget
 			brew link gecode
 			brew linkapps
