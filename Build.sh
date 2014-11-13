@@ -190,6 +190,9 @@ if [[ $ISCORE_CLEAN_CLASSIC_BUILD ]]; then
 
 		# Jamoma
 		sudo rm -rf /usr/local/jamoma /usr/local/lib/jamoma
+
+		# local build
+		rm -rf build
 	fi
 
 	echo "Cleaning was successful."
