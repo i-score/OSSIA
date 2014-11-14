@@ -190,6 +190,9 @@ if [[ $ISCORE_CLEAN_CLASSIC_BUILD ]]; then
 
 		# Jamoma
 		sudo rm -rf /usr/local/jamoma /usr/local/lib/jamoma
+
+		# local build
+		rm -rf build
 	fi
 
 	echo "Cleaning was successful."
@@ -330,6 +333,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
+			brew update
 			brew install cmake gecode portaudio portmidi libsndfile qt5 wget
 			brew link gecode
 			brew linkapps
