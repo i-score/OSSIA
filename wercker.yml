@@ -1,6 +1,0 @@
-box: ubuntu14.04
-build:
-    steps:
-        - script:
-            name: OSSIA Build
-            code: ./Build.sh jamoma iscore --install-deps --clone --multi

@@ -1,3 +1,9 @@
-language: cpp
+os:
+  - linux
+  - osx
+  
+osx_image: xcode61
 
-script: sh -c "./Build.sh jamoma iscore --install-deps --clone --multi"
+script:
+  - ./Travis.sh
+  
