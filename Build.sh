@@ -330,7 +330,11 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
-			brew install cmake gecode portaudio portmidi libsndfile qt5
+			declare -a brew_pkgs=("cmake" "gecode" "portaudio" "portmidi" "libsndfile" "qt5")
+			for PKG in "${brew_pkgs[@]}"
+			do
+				brew install $PKG
+			done
 			brew link gecode
 			brew linkapps
 		elif command which port; then # MacPorts
@@ -476,8 +480,10 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		#
 		(
 			cd ../../$ISCORE_FOLDER/;
-			wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
-			unzip installer_data.zip -d installer_data;
+			if [[ ! -f installer_data.zip ]]; then
+				wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
+				unzip installer_data.zip -d installer_data;
+			fi
 		)
 		# Build i-score
 		cd ..
