@@ -337,7 +337,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			declare -a brew_pkgs=("cmake" "gecode" "portaudio" "portmidi" "libsndfile" "qt5" "wget")
 			for PKG in "${brew_pkgs[@]}"
 			do
-				brew install $PKG
+				brew install $PKG --build-bottle
 			done
 			brew link gecode
 			brew linkapps
