@@ -10,8 +10,8 @@ if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then
 	
 	export CMAKE_PATH="$(pwd)/cmake-3.0.2-Linux-x86_64/bin"
 	source /opt/qt53/bin/qt53-env.sh
-	exec sh -c 'PATH=$CMAKE_PATH:$PATH ./Build.sh jamoma iscore --clone'
+	exec sh -c 'PATH=$CMAKE_PATH:$PATH ./Build.sh jamoma iscore --clone --optimize'
 else 
-	exec ./Build.sh jamoma iscore --clone --install-deps
+	exec ./Build.sh jamoma iscore --clone --install-deps --optimize
 fi
 	
