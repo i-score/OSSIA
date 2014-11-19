@@ -13,6 +13,8 @@ ISCORE_JAMOMA_BRANCH="feature/cmake"
 ISCORE_SCORE_BRANCH="feature/cmake"
 ISCORE_ISCORE_BRANCH="dev"
 
+ISCORE_BREW_FLAGS="--build-bottle"
+
 function fixup_deb_pkg {
 	PKG=$1
 	echo "Fixing package : $PKG"
@@ -63,6 +65,8 @@ Options :
   Cross-build for Android. Only i-score 0.3. Requires the NDK & a toolchain with compiled libs. See AndroidBuild.txt.
   To cross-build, please set ANDROID_NDK_ROOT to your NDK path and ANDROID_QT_BIN to the corresponding qmake executable folder.
 
+--optimize
+  Builds with optimizations enabled. More speed, but is not suitable for distribution on older computers or different processors.
 --clean
   Removes the build folder and the executables prior to building.
 --uninstall
@@ -137,6 +141,11 @@ do
 	--master) echo "Using the master branch"
 		ISCORE_SCORE_BRANCH="master"
 		ISCORE_ISCORE_BRANCH="master"
+		;;
+	--optimize) echo "Optimized build"
+		ISCORE_BREW_FLAGS=""
+		CFLAGS="-Ofast -march=native"
+		CXXFLAGS="$CFLAGS"
 		;;
 	--uninstall) echo "Will uninstall Jamoma"
 		ISCORE_UNINSTALL_JAMOMA=1
@@ -351,7 +360,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			declare -a brew_pkgs=("cmake" "gecode" "portaudio" "portmidi" "libsndfile" "qt5" "wget")
 			for PKG in "${brew_pkgs[@]}"
 			do
-				brew install $PKG --build-bottle
+				brew install $PKG "$ISCORE_BREW_FLAGS"
 			done
 			brew link gecode
 			brew linkapps
