@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 ########################################
 ###### Intro & Parameter handling ######
 ########################################
@@ -12,6 +12,20 @@ ISCORE_FOLDER="i-score"
 ISCORE_JAMOMA_BRANCH="feature/cmake"
 ISCORE_SCORE_BRANCH="feature/cmake"
 ISCORE_ISCORE_BRANCH="dev"
+
+function fixup_deb_pkg {
+	PKG=$1
+	echo "Fixing package : $PKG"
+	echo
+	mkdir fix_up_deb
+	dpkg-deb -x $PKG fix_up_deb
+	dpkg-deb --control $PKG fix_up_deb/DEBIAN
+	rm $PKG
+	chmod 0644 fix_up_deb/DEBIAN/md5sums
+	find -type d -print0 |xargs -0 chmod 755
+	fakeroot dpkg -b fix_up_deb $PKG
+	rm -rf fix_up_deb	
+}
 
 HELP_MESSAGE="Usage : $(basename "$0") [software] [options]
 Builds Jamoma, Score, and i-score 0.2, 0.3 on Linux and OS X systems.
@@ -73,13 +87,13 @@ iscore
 --jamoma-path
 "
 
-if test $# -eq 0 ; then
-	echo "Will build i-score for OS X. For more options, run with --help."
-	make distclean;
-	qmake -nocache -spec unsupported/macx-clang i-score.pro;
-	make;
-	exit 0
-fi
+#if test $# -eq 0 ; then
+#	echo "Will build i-score for OS X. For more options, run with --help."
+#	make distclean;
+#	qmake -nocache -spec unsupported/macx-clang i-score.pro;
+#	make;
+#	exit 0
+#fi
 
 while test $# -gt 0
 do
@@ -274,7 +288,7 @@ if [[ $ISCORE_UNINSTALL_JAMOMA ]]; then
 		sudo rm -rf /usr/lib/libJamoma*
 
 	elif [[ $ISCORE_DEBIAN ]]; then
-		sudo apt-get remove jamomacore
+		sudo apt-get -y remove jamomacore
 		sudo rm -rf /usr/lib/libJamoma*
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -450,7 +464,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			fi
 
 			# Install
-			sudo apt remove jamomacore
+			fixup_deb_pkg JamomaCore-0.6-dev-Linux.deb
 			sudo dpkg -i JamomaCore-0.6-dev-Linux.deb
 			cp JamomaCore-0.6-dev-Linux.deb ../../
 
@@ -501,6 +515,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			exit 1
 		fi
 		make package
+		fixup_deb_pkg i-score-0.2.2-Linux.deb
 		cp i-score-0.2.2-Linux.deb ../..
 
 #		if [[ $ISCORE_RECAST ]]; then
@@ -638,3 +653,4 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		echo "System not supported yet."
 	fi
 fi
+	
