@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 ########################################
 ###### Intro & Parameter handling ######
 ########################################
@@ -360,7 +360,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			declare -a brew_pkgs=("cmake" "gecode" "portaudio" "portmidi" "libsndfile" "qt5" "wget")
 			for PKG in "${brew_pkgs[@]}"
 			do
-				brew install $PKG "$ISCORE_BREW_FLAGS"
+				brew install $PKG $ISCORE_BREW_FLAGS
 			done
 			brew link gecode
 			brew linkapps
