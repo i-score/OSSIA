@@ -55,7 +55,7 @@ Options :
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
 
 --no-jamoma-max
-  Does not build Jamoma Max implementation.
+  Does not build Jamoma Max implementation. Only effective on OS X (since there is no Max on Linux)
 --jamoma-path=/some/path/to/Jamoma/Core folder
   Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
 --debug
@@ -400,7 +400,11 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	else
 		git clone https://github.com/Jamoma/Jamoma
 		git clone -b $ISCORE_JAMOMA_BRANCH https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
-		git clone -b $ISCORE_JAMOMAMAX_BRANCH https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT #todo
+
+		if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+			git clone -b $ISCORE_JAMOMAMAX_BRANCH https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT #todo
+		fi
+
 		git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
 
 		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
