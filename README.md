@@ -11,10 +11,11 @@ Please refer to the additional notes prior to running the commands.
 
 Required OS versions: MacOS 10.7 and above, Win7 and above, Ubuntu 14.04 and above.
 
-# Setup 
-### (Requires brew / macports on OS X)
-(see instructions below to install brew for OSX)
-
+# First Run    
+You need git installed on your computer
+##OSX
+You need to install brew / macports on OS X. See instructions below to install brew for OSX
+##Linux & OSX
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
