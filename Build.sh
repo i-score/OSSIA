@@ -154,7 +154,7 @@ do
 		ISCORE_UNINSTALL_JAMOMA=1
 		;;
 	--no-jamoma-max) echo "Will not install JamomaMax"
-		ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX"
+		ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX:bool==True"
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
@@ -181,6 +181,7 @@ done
 ########## GENERAL CONFIG ##########
 ###### Check of the Linux distribution ######
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX:bool==True" # don't need to try to build JamomaMax under Linux
 	if [ -f /etc/fedora-release ] ; then # yum
 		ISCORE_FEDORA=1
 	elif [[ `lsb_release -si` = 'Debian' || `lsb_release -si` = 'Ubuntu' || `lsb_release -si` = 'LinuxMint' || -f /etc/debian_version ]]; then # apt
