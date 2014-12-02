@@ -10,6 +10,7 @@ ISCORE_DEPTH_GIT="--depth=1"
 ISCORE_FOLDER="i-score"
 
 ISCORE_JAMOMA_BRANCH="feature/cmake"
+ISCORE_JAMOMAMAX_BRANCH="feature/cmake"
 ISCORE_SCORE_BRANCH="feature/cmake"
 ISCORE_ISCORE_BRANCH="dev"
 
@@ -26,7 +27,7 @@ function fixup_deb_pkg {
 	chmod 0644 fix_up_deb/DEBIAN/md5sums
 	find -type d -print0 |xargs -0 chmod 755
 	fakeroot dpkg -b fix_up_deb $PKG
-	rm -rf fix_up_deb	
+	rm -rf fix_up_deb
 }
 
 HELP_MESSAGE="Usage : $(basename "$0") [software] [options]
@@ -53,6 +54,8 @@ Options :
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
 
+--no-jamoma-max
+  Does not build Jamoma Max implementation.
 --jamoma-path=/some/path/to/Jamoma/Core folder
   Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
 --debug
@@ -149,6 +152,9 @@ do
 		;;
 	--uninstall) echo "Will uninstall Jamoma"
 		ISCORE_UNINSTALL_JAMOMA=1
+		;;
+	--no-jamoma-max) echo "Will not install JamomaMax"
+		ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX"
 		;;
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
@@ -335,25 +341,6 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev wget
 		fi
 
-		# To prevent incompatibilities with distribution packages which might ship a Gecode which links against qt4, we build our own.
-		#wget http://www.gecode.org/download/gecode-4.3.0.tar.gz
-		#tar -zxf gecode-4.3.0.tar.gz
-		#(
-		#	cd gecode-4.3.0;
-		#	mkdir build;
-		#	cd build;
-		#	cmake -DBUILD_SHARED_LIBS:BOOL=ON -DGECODE_USE_QT:BOOL=FALSE ..;
-		#	make -j$ISCORE_NUM_THREADS;
-		#	mkdir tmp_folder;
-
-		#	cp --parents `find ../gecode -name \*.hpp` tmp_folder;
-		#	cp --parents `find ../gecode -name \*.hh` tmp_folder;
-
-		#	sudo cp -rf gecode /usr/include;
-		#	sudo cp *.so /usr/lib/;
-		#)
-
-
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
 			brew update
@@ -413,7 +400,7 @@ if [[ $ISCORE_CLONE_GIT ]]; then
 	else
 		git clone https://github.com/Jamoma/Jamoma
 		git clone -b $ISCORE_JAMOMA_BRANCH https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
-		git clone -b dev https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT
+		git clone -b $ISCORE_JAMOMAMAX_BRANCH https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT #todo
 		git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
 
 		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
@@ -449,7 +436,8 @@ cd build/jamoma
 
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+
+	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN $ISCORE_CMAKE_MAX_FLAGS
 	if [ $? -ne 0 ]; then
 		exit 1
 	fi
@@ -527,20 +515,6 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		fixup_deb_pkg i-score-0.2.2-Linux.deb
 		cp i-score-0.2.2-Linux.deb ../..
 
-#		if [[ $ISCORE_RECAST ]]; then
-#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-#			make -j$ISCORE_NUM_THREADS
-#			cp i-scoreRecast ../../i-score0.3
-#		else
-#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-#			make -j$ISCORE_NUM_THREADS
-#			if [ $? -ne 0 ]; then
-#				exit 1
-#			fi
-#			cp i-score ../../i-score0.2
-#		fi
-
-
 	elif [[ "$OSTYPE" == "android" ]]; then # Android
 		cd ..
 		mkdir $ISCORE_FOLDER
@@ -556,110 +530,32 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		cp android_build_output/bin/QtApp-debug.apk ../../i-score-debug.apk
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-    echo "------- BUILDING ISCORE --------"
-    cd ..
-    mkdir $ISCORE_FOLDER
-    cd $ISCORE_FOLDER
+	    cd ..
+	    mkdir $ISCORE_FOLDER
+	    cd $ISCORE_FOLDER
 
-    ISCORE_CMAKE_QT_CONFIG="$(find /usr/local/Cellar/qt5 -name Qt5Config.cmake)"
-    ISCORE_CMAKE_QT_PATH="$(dirname $ISCORE_CMAKE_QT_CONFIG)"
-    (
-      cd ../../$ISCORE_FOLDER/;
-      if [[ ! -f installer_data.zip ]]; then
-        wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
-        unzip installer_data.zip -d installer_data;
-      fi
-    )
-
-
-    cmake ../../$ISCORE_FOLDER -DCMAKE_PREFIX_PATH="$ISCORE_CMAKE_QT_PATH;/usr/local/jamoma/lib" -DCMAKE_BUILD_TYPE=Release
-    make -j$ISCORE_NUM_THREADS
-    if [ $? -ne 0 ]; then
-      exit 1
-    fi
-
-    make package
-    cp i-score.dmg ../..
-    exit 0
+	    ISCORE_CMAKE_QT_CONFIG="$(find /usr/local/Cellar/qt5 -name Qt5Config.cmake)"
+	    ISCORE_CMAKE_QT_PATH="$(dirname $ISCORE_CMAKE_QT_CONFIG)"
+	    (
+	      cd ../../$ISCORE_FOLDER/;
+	      if [[ ! -f installer_data.zip ]]; then
+	        wget "https://www.dropbox.com/sh/iwqky9vh1xuu9qq/AAAaWdkqHHDFGiVDr05jUxrra?dl=1" -O installer_data.zip;
+	        unzip installer_data.zip -d installer_data;
+	      fi
+	    )
 
 
+	    cmake ../../$ISCORE_FOLDER -DCMAKE_PREFIX_PATH="$ISCORE_CMAKE_QT_PATH;/usr/local/jamoma/lib" -DCMAKE_BUILD_TYPE=Release
+	    make -j$ISCORE_NUM_THREADS
+	    if [ $? -ne 0 ]; then
+	      exit 1
+	    fi
 
+	    make package
+	    cp i-score.dmg ../..
 
-
-
-    ####################
-		ISCORE_QMAKE_BIN="$(find /usr/local/Cellar/qt5 -name qmake)"
-		ISCORE_QMAKE_BIN_PATH="$(dirname $ISCORE_QMAKE_BIN)"
-
-		cd ..
-		mkdir $ISCORE_FOLDER
-		cd $ISCORE_FOLDER
-		if [[ $ISCORE_RECAST ]]; then
-			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			if [ $? -ne 0 ]; then
-				exit 1
-			fi
-		else
-			$ISCORE_QMAKE_BIN_PATH/$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-			if [ $? -ne 0 ]; then
-				exit 1
-			fi
-		fi
-		make -j$ISCORE_NUM_THREADS
-		if [ $? -ne 0 ]; then
-			exit 1
-		fi
-
-		cd ../..
-		if [[ $ISCORE_RECAST ]]; then
-			$ISCORE_QMAKE_BIN_PATH/macdeployqt build/$ISCORE_FOLDER/i-scoreRecast.app
-			ISCORE_EXECUTABLE_NAME=i-score0.3
-			rm -rf $ISCORE_EXECUTABLE_NAME.app
-			cp -rf build/$ISCORE_FOLDER/i-scoreRecast.app $ISCORE_EXECUTABLE_NAME.app
-		else
-			$ISCORE_QMAKE_BIN_PATH/macdeployqt build/$ISCORE_FOLDER/i-score.app
-			ISCORE_EXECUTABLE_NAME=i-score0.2
-			rm -rf $ISCORE_EXECUTABLE_NAME.app
-			cp -rf build/$ISCORE_FOLDER/i-score.app $ISCORE_EXECUTABLE_NAME.app
-		fi
-
-		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/lib
-		mkdir -p $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions
-
-
-		### Deployment ###
-		# Jamoma libs
-		declare -a jamomalibs=("Foundation" "Modular" "DSP" "Score")
-		declare -a jamomaexts=("Scenario" "Automation" "Interval" "OSC" "Minuit" "MIDI" "AnalysisLib" "DataspaceLib" "FunctionLib" "System" "NetworkLib")
-		for JAMOMA_LIB in "${jamomalibs[@]}"
-		do
-			cp -rf /usr/local/jamoma/lib/libJamoma$JAMOMA_LIB.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/lib/
-		done
-		for JAMOMA_EXT in "${jamomaexts[@]}"
-		do
-			cp -rf /usr/local/jamoma/extensions/$JAMOMA_EXT.ttdylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/
-		done
-		# Jamoma rpath
-		if [[ $ISCORE_RECAST ]]; then
-			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-scoreRecast
-			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-scoreRecast
-		else
-			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/lib $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
-			install_name_tool -add_rpath @executable_path/../Frameworks/jamoma/extensions $ISCORE_EXECUTABLE_NAME.app/Contents/MacOS/i-score
-		fi
-
-		# Portmidi
-		cp -rf /usr/local/lib/libportmidi.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/
-		install_name_tool -change /usr/local/lib/libportmidi.dylib @executable_path/../Frameworks/libportmidi.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/MIDI.ttdylib
-
-		# Gecode linking
-		declare -a gecodelibs=("kernel" "support" "int" "set" "driver" "flatzinc" "minimodel" "search" "float")
-		for GECODE_LIB in "${gecodelibs[@]}"
-		do
-			install_name_tool -change /usr/local/lib/libgecode$GECODE_LIB.36.dylib @executable_path/../Frameworks/libgecode$GECODE_LIB.36.dylib $ISCORE_EXECUTABLE_NAME.app/Contents/Frameworks/jamoma/extensions/Scenario.ttdylib
-		done
 	else
 		echo "System not supported yet."
 	fi
 fi
-	
+
