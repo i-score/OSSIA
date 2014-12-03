@@ -486,7 +486,8 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		if [ $? -ne 0 ]; then
 			exit 1
 		fi
-
+    sudo chown $USER JamomaCore-0.6-dev-Darwin.tar.gz
+    sudo chmod a+rw JamomaCore-0.6-dev-Darwin.tar.gz
 		cp JamomaCore-0.6-dev-Darwin.tar.gz ../../
 	else
 		echo "Not supported yet."
