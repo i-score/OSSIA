@@ -482,7 +482,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 			exit 1
 		fi
 
-		cpack -G TGZ
+		sudo cpack -G TGZ
 		if [ $? -ne 0 ]; then
 			exit 1
 		fi
