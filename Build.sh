@@ -557,7 +557,9 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	      exit 1
 	    fi
 
-	    make package
+	    sudo make package
+	    sudo chown $USER i-score.dmg
+	    sudo chmod a+rw i-score.dmg
 	    cp i-score.dmg ../..
 
 	else
