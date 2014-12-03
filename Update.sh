@@ -5,18 +5,18 @@ git pull
 
 if [ -d Jamoma/Core ]; then
   echo "Updating Jamoma/Core"
-  (cd Jamoma/Core; git pull)
+  (cd Jamoma/Core; git pull && git submodule foreach git pull)
 fi
 if [ -d Jamoma/Core/Score ]; then
   echo "Updating Jamoma/Core/Score"
-  (cd Jamoma/Core/Score; git pull)
+  (cd Jamoma/Core/Score; git pull  && git submodule foreach git pull)
 fi
 if [ -d i-score ]; then
   echo "Updating i-score"
-  (cd i-score; git pull)
+  (cd i-score; git pull  && git submodule foreach git pull)
 fi
 if [ -d i-scoreRecast ]; then
   echo "Updating i-scoreRecast"
-  (cd i-scoreRecast; git pull)
+  (cd i-scoreRecast; git pull && git submodule foreach git pull)
 fi
 
