@@ -477,7 +477,7 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 		make -j$ISCORE_NUM_THREADS
 		sudo cp *.so /opt/android-toolchain/arm-linux-androideabi/lib/jamoma
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
-		sudo make -j$ISCORE_NUM_THREADS install
+		make -j$ISCORE_NUM_THREADS && sudo make install
 		if [ $? -ne 0 ]; then
 			exit 1
 		fi
