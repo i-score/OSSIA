@@ -14,7 +14,9 @@ ISCORE_JAMOMAMAX_BRANCH="feature/cmake"
 ISCORE_SCORE_BRANCH="feature/cmake"
 ISCORE_ISCORE_BRANCH="dev"
 
-ISCORE_BREW_FLAGS="--build-bottle"
+ISCORE_BREW_FLAGS="--build-bottle" 
+
+ISCORE_CMAKE_PD_FLAGS="-DDONT_BUILD_JAMOMAPD:bool==True"  # don't build JamomaPd for now
 
 function fixup_deb_pkg {
 	PKG=$1
@@ -54,6 +56,8 @@ Options :
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
 
+--no-jamoma-pd
+  Does not build Jamoma PureData implementation.
 --no-jamoma-max
   Does not build Jamoma Max implementation. Only effective on OS X (since there is no Max on Linux)
 --jamoma-path=/some/path/to/Jamoma/Core folder
@@ -152,6 +156,9 @@ do
 		;;
 	--uninstall) echo "Will uninstall Jamoma"
 		ISCORE_UNINSTALL_JAMOMA=1
+		;;
+	--no-jamoma-pd) echo "Will not install JamomaPd"
+		ISCORE_CMAKE_PD_FLAGS="-DDONT_BUILD_JAMOMAPD:bool==True"
 		;;
 	--no-jamoma-max) echo "Will not install JamomaMax"
 		ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX:bool==True"
@@ -442,7 +449,7 @@ cd build/jamoma
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 
-	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN $ISCORE_CMAKE_MAX_FLAGS
+	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN $ISCORE_CMAKE_MAX_FLAGS $ISCORE_CMAKE_PD_FLAGS
 	if [ $? -ne 0 ]; then
 		exit 1
 	fi
