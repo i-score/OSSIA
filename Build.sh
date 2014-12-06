@@ -339,7 +339,7 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 		if [[ $ISCORE_FEDORA ]]; then
 			su -c 'yum install qt5-qtbase qt5-qtbase-devel qt5-qttools qt5-qtsvg qt5-qtsvg-devel cmake git gecode-devel libxml2-devel libsndfile-devel portaudio-devel portmidi portmidi-tools portmidi-devel libstdc++-devel wget'
 		elif [[ $ISCORE_DEBIAN ]]; then
-			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev wget
+			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev wget fakeroot
 		fi
 
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
