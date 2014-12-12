@@ -12,9 +12,14 @@ Please refer to the additional notes prior to running the commands.
 Required OS versions: MacOS 10.7 and above, Win7 and above, Ubuntu 14.04 and above.
 
 # First Run    
-You need git installed on your computer
+
+Running `./Build.sh` will give you all the supported options.
+
 ##OSX
-You need to install brew / macports on OS X. See instructions below to install brew for OSX
+You need to install brew / macports on OS X. See instructions below to install brew for OS X.
+
+Jamoma for Max externals will be automatically build.
+
 ##Linux & OSX
 If you want to try the current i-score release quickly, run : 
 
