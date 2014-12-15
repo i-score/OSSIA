@@ -14,6 +14,9 @@ ISCORE_SCORE_BRANCH="feature/cmake"
 ISCORE_ISCORE_BRANCH="dev"
 
 ISCORE_BREW_FLAGS="--build-bottle"
+ISCORE_BREW_UNIVERSAL_FLAGS="--universal"
+ISCORE_CMAKE_UNIVERSAL_FLAGS="-DCMAKE_OSX_ARCHITECTURES=x86_64;i386"
+
 
 function fixup_deb_pkg {
 	PKG=$1
@@ -26,7 +29,7 @@ function fixup_deb_pkg {
 	chmod 0644 fix_up_deb/DEBIAN/md5sums
 	find -type d -print0 |xargs -0 chmod 755
 	fakeroot dpkg -b fix_up_deb $PKG
-	rm -rf fix_up_deb	
+	rm -rf fix_up_deb
 }
 
 HELP_MESSAGE="Usage : $(basename "$0") [software] [options]
@@ -34,13 +37,17 @@ Builds Jamoma, Score, and i-score 0.2, 0.3 on Linux and OS X systems.
 
 Software :
 iscore
-  Builds (not yet installs) i-score.
+  Builds and packages i-score. Requires jamoma to be installed.
+	(Calling the script with jamoma will do)
+
+i-score_player
+  Builds the i-score command-line player. Requires jamoma to be installed.
 
 iscore-recast
-  Builds i-score 0.3 instead of 0.2. Overrides iscore.
+  Builds i-score 0.3 instead of 0.2. Overrides iscore. NOT READY.
 
 jamoma
-  Builds and installs Jamoma on the system folders.
+  Builds and installs Jamoma on the system folders, or creates release packages.
 
 Options :
 --clone
@@ -64,6 +71,8 @@ Options :
 --android
   Cross-build for Android. Only i-score 0.3. Requires the NDK & a toolchain with compiled libs. See AndroidBuild.txt.
   To cross-build, please set ANDROID_NDK_ROOT to your NDK path and ANDROID_QT_BIN to the corresponding qmake executable folder.
+--universal
+	Builds an universal binary for OS X. Warning: does not work well with brew; portmidi and gecode have to be built by hand
 
 --optimize
   Builds with optimizations enabled. More speed, but is not suitable for distribution on older computers or different processors.
@@ -90,14 +99,6 @@ iscore
 --install-deps
 --jamoma-path
 "
-
-#if test $# -eq 0 ; then
-#	echo "Will build i-score for OS X. For more options, run with --help."
-#	make distclean;
-#	qmake -nocache -spec unsupported/macx-clang i-score.pro;
-#	make;
-#	exit 0
-#fi
 
 while test $# -gt 0
 do
@@ -147,14 +148,22 @@ do
 		CFLAGS="-Ofast -march=native"
 		CXXFLAGS="$CFLAGS"
 		;;
+	--universal) echo "OS X only: Universal build (i386; x86_64)"
+		ISCORE_BREW_UNIVERSAL_FLAGS=""
+		ISCORE_CMAKE_UNIVERSAL_FLAGS=""
+		;;
 	--uninstall) echo "Will uninstall Jamoma"
 		ISCORE_UNINSTALL_JAMOMA=1
 		;;
+
 	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
 		ISCORE_INSTALL_ISCORE=1
 		ISCORE_RECAST=1
 		ISCORE_FOLDER="i-scoreRecast"
 		;;
+	i-score_player) echo "Will build the command line player"
+		ISCORE_INSTALL_PLAYER=1
+	  ;;
 	iscore) echo "Will build iscore"
 		ISCORE_INSTALL_ISCORE=1
 		;;
@@ -335,33 +344,20 @@ if [[ $ISCORE_INSTALL_DEPS ]]; then
 			sudo apt-get -y install libgecode-dev g++ qtchooser qt5-default qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtdeclarative5-dev libqt5svg5-dev cmake git libgl1-mesa-dev libxml2-dev libsndfile-dev portaudio19-dev libportmidi-dev clang-3.4 libstdc++-4.8-dev libc++-dev wget
 		fi
 
-		# To prevent incompatibilities with distribution packages which might ship a Gecode which links against qt4, we build our own.
-		#wget http://www.gecode.org/download/gecode-4.3.0.tar.gz
-		#tar -zxf gecode-4.3.0.tar.gz
-		#(
-		#	cd gecode-4.3.0;
-		#	mkdir build;
-		#	cd build;
-		#	cmake -DBUILD_SHARED_LIBS:BOOL=ON -DGECODE_USE_QT:BOOL=FALSE ..;
-		#	make -j$ISCORE_NUM_THREADS;
-		#	mkdir tmp_folder;
-
-		#	cp --parents `find ../gecode -name \*.hpp` tmp_folder;
-		#	cp --parents `find ../gecode -name \*.hh` tmp_folder;
-
-		#	sudo cp -rf gecode /usr/include;
-		#	sudo cp *.so /usr/lib/;
-		#)
-
-
 	elif [[ "$OSTYPE" == "darwin"* ]]; then # Mac OS X
 		if command which brew; then # Brew
 			brew update
-			declare -a brew_pkgs=("cmake" "gecode" "portaudio" "portmidi" "libsndfile" "qt5" "wget")
+			brew install cmake wget # Tools, no need for fancy build options
+
+			# The libraries we use
+			declare -a brew_pkgs=("gecode" "portaudio" "portmidi" "libsndfile")
 			for PKG in "${brew_pkgs[@]}"
 			do
-				brew install $PKG $ISCORE_BREW_FLAGS
+				brew install $PKG $ISCORE_BREW_FLAGS $ISCORE_BREW_UNIVERSAL_FLAGS
+				brew postinstall $PKG
 			done
+
+			brew install qt5 # It's already a bottle, it would take too much time to build.
 			brew link gecode
 			brew linkapps
 		elif command which port; then # MacPorts
@@ -449,7 +445,7 @@ cd build/jamoma
 
 # Build
 if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+	cmake "$ISCORE_JAMOMA_PATH/Core" $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_UNIVERSAL_FLAGS $ISCORE_CMAKE_TOOLCHAIN
 	if [ $? -ne 0 ]; then
 		exit 1
 	fi
@@ -500,6 +496,16 @@ if [[ $ISCORE_INSTALL_JAMOMA ]]; then
 	fi
 fi
 
+##### BUILD COMMAND LINE PLAYER ######
+if [[ $ISCORE_INSTALL_PLAYER ]]; then
+	(
+	  mkdir -p build/iscore_player
+		cd build/iscore_player
+		cmake $ISCORE_JAMOMA_PATH/Core/Score/implementations/i-score $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
+		make -j$ISCORE_NUM_THREADS
+		make install
+	)
+fi
 
 ##### Build i-score #####
 if [[ $ISCORE_INSTALL_ISCORE ]]; then
@@ -662,4 +668,3 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 		echo "System not supported yet."
 	fi
 fi
-	
