@@ -184,7 +184,7 @@ do
 	jamoma) echo "Will install Jamoma in the system folders"
 		ISCORE_INSTALL_JAMOMA=1
 		;;
-	--clean) "Removal of the build folder"
+	--clean) echo "Removal of the build folder"
 		rm -rf build
 		;;
 	*) echo "Wrong option : $1"
