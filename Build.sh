@@ -21,6 +21,8 @@ ISCORE_ISCORE_BRANCH="dev"
 ISCORE_BREW_FLAGS="--build-bottle"
 ISCORE_CMAKE_PD_FLAGS="-DDONT_BUILD_JAMOMAPD:bool==True"  # don't build JamomaPd for now
 
+source settings.sh
+
 function fixup_deb_pkg {
 	PKG=$1
 	echo "Fixing package : $PKG"
@@ -573,8 +575,13 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	    mkdir $ISCORE_FOLDER
 	    cd $ISCORE_FOLDER
 
-	    ISCORE_CMAKE_QT_CONFIG="$(find /usr/local/Cellar/qt5 -name Qt5Config.cmake)"
-	    ISCORE_CMAKE_QT_PATH="$(dirname $ISCORE_CMAKE_QT_CONFIG)"
+	    if [[ -z "$ISCORE_QT_PATH" ]]; then
+		    ISCORE_CMAKE_QT_CONFIG="$(find /usr/local/Cellar/qt5 -name Qt5Config.cmake)"
+		    ISCORE_CMAKE_QT_PATH="$(dirname $(dirname $ISCORE_CMAKE_QT_CONFIG))"
+	    else
+		    ISCORE_CMAKE_QT_PATH="$ISCORE_QT_PATH/lib/cmake"
+	   fi
+
 	    (
 	      cd ../../$ISCORE_FOLDER/;
 	      if [[ ! -f installer_data.zip ]]; then
@@ -584,7 +591,7 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 	    )
 
 
-	    cmake ../../$ISCORE_FOLDER -DCMAKE_PREFIX_PATH="$ISCORE_CMAKE_QT_PATH;/usr/local/jamoma/lib" -DCMAKE_BUILD_TYPE=Release
+	    cmake ../../$ISCORE_FOLDER -DCMAKE_PREFIX_PATH="$ISCORE_CMAKE_QT_PATH/Qt5;$ISCORE_CMAKE_QT_PATH/Qt5Widgets;$ISCORE_CMAKE_QT_PATH/Qt5Test;$ISCORE_CMAKE_QT_PATH/Qt5Gui;$ISCORE_CMAKE_QT_PATH/Qt5Xml;$ISCORE_CMAKE_QT_PATH/Qt5Core;/usr/local/jamoma/lib" -DCMAKE_BUILD_TYPE=Release
 	    make -j$ISCORE_NUM_THREADS
 	    if [ $? -ne 0 ]; then
 	      exit 1
