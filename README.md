@@ -11,10 +11,16 @@ Please refer to the additional notes prior to running the commands.
 
 Required OS versions: MacOS 10.7 and above, Win7 and above, Ubuntu 14.04 and above.
 
-# Setup 
-### (Requires brew / macports on OS X)
-(see instructions below to install brew for OSX)
+# First Run    
 
+Running `./Build.sh` will give you all the supported options.
+
+##OSX
+You need to install brew / macports on OS X. See instructions below to install brew for OS X.
+
+Jamoma for Max externals will be automatically build.
+
+##Linux & OSX
 If you want to try the current i-score release quickly, run : 
 
     ./Build.sh jamoma iscore --clone --install-deps
@@ -90,8 +96,3 @@ In this case, the following packages must be installed manually from the Trusty 
     http://packages.ubuntu.com/trusty/libgecodegist36
     http://packages.ubuntu.com/trusty/libgecodeflatzinc36
     http://packages.ubuntu.com/trusty/libgecode-dev
-
-## Raspberry Pi setup
-From a new Raspbian installation, run the following command line to install needed package :
-`sudo apt-get update && sudo apt-get install -y cmake libxml2-dev libgecode-dev`
-
