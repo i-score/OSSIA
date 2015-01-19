@@ -524,22 +524,8 @@ if [[ $ISCORE_INSTALL_ISCORE ]]; then
 			exit 1
 		fi
 		make package
-		fixup_deb_pkg i-score-0.2.2-Linux.deb
-		cp i-score-0.2.2-Linux.deb ../..
-
-#		if [[ $ISCORE_RECAST ]]; then
-#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreRecast.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-#			make -j$ISCORE_NUM_THREADS
-#			cp i-scoreRecast ../../i-score0.3
-#		else
-#			$ISCORE_QMAKE ../../$ISCORE_FOLDER/i-scoreNew.pro $ISCORE_QMAKE_TOOLCHAIN $ISCORE_QMAKE_DEBUG
-#			make -j$ISCORE_NUM_THREADS
-#			if [ $? -ne 0 ]; then
-#				exit 1
-#			fi
-#			cp i-score ../../i-score0.2
-#		fi
-
+		fixup_deb_pkg i-score-0.2.3-Linux.deb
+		cp i-score-0.2.3-Linux.deb ../..
 
 	elif [[ "$OSTYPE" == "android" ]]; then # Android
 		cd ..
