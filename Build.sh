@@ -48,9 +48,6 @@ iscore
 i-score_player
   Builds the i-score command-line player. Requires jamoma to be installed.
 
-iscore-recast
-  Builds i-score 0.3 instead of 0.2. Overrides iscore. NOT READY.
-
 jamoma
   Builds and installs Jamoma on the system folders, or creates release packages.
 
@@ -59,8 +56,6 @@ Options :
   Clones the git repositories.
 --fetch-all
   Fetches the full git repositories instead of the tip of the feature/cmake branch. Useful for development.
---master
-  Uses the master branch instead of the dev or feature/cmake branch
 
 --install-deps
   Installs dependencies using apt-get / yum on Linux and brew / port on OS X.
@@ -69,8 +64,6 @@ Options :
   Does not build Jamoma PureData implementation.
 --no-jamoma-max
   Does not build Jamoma Max implementation. Only effective on OS X (since there is no Max on Linux)
---jamoma-path=/some/path/to/Jamoma/Core folder
-  Uses an existing Jamoma installation. Note : it has to be on a branch with CMake (currently feature/cmake).
 --debug
   Builds everything with debug informations.
 --use-clang
@@ -93,20 +86,6 @@ Options :
 --help
   Shows this message
 
-===============
-
-Classic mode options :
---classic (transitional)
-  Uses the ruby.rb script to build Jamoma.
---clean-classic
-  Cleans the dependencies and the files installed by the classic build.
-
-Note: in this mode, only the following options are effective:
-jamoma
-iscore
---clone
---install-deps
---jamoma-path
 "
 
 while test $# -gt 0
@@ -172,11 +151,6 @@ do
 		ISCORE_CMAKE_MAX_FLAGS="-DDONT_BUILD_JAMOMAMAX:bool==True"
 		;;
 
-	iscore-recast) echo "Will build i-score v0.3 instead of v0.2"
-		ISCORE_INSTALL_ISCORE=1
-		ISCORE_RECAST=1
-		ISCORE_FOLDER="i-scoreRecast"
-		;;
 	i-score_player) echo "Will build the command line player"
 		ISCORE_INSTALL_PLAYER=1
 	  ;;
@@ -219,97 +193,6 @@ else
 	ISCORE_NUM_THREADS=1
 fi
 
-########## CLASSIC BUILD ###########
-# Cleaning
-if [[ $ISCORE_CLEAN_CLASSIC_BUILD ]]; then
-	echo "Removing classic build only."
-	echo "WARNING : Jamoma, Qt, Gecode and libXml will be removed, as they interfere with the one installed using a package manager like brew or macports."
-	read -p "Please confirm your intent by pressing 'y': " -n 1 -r
-	echo
-	if [[ $REPLY =~ ^[Yy]$ ]]
-	then
-		# Qt
-		sudo python /Developer/Tools/uninstall-qt.py
-
-		# Gecode
-		sudo rm -rf /Library/Frameworks/Gecode.framework /usr/local/bin/fz /usr/local/bin/mzn-gecode /usr/local/share/gecode
-
-		# libXml
-		sudo rm -rf /Library/Frameworks/libxml.framework
-
-		# Jamoma
-		sudo rm -rf /usr/local/jamoma /usr/local/lib/jamoma
-
-		# local build
-		rm -rf build
-	fi
-
-	echo "Cleaning was successful."
-	exit 0
-fi
-
-# Building
-if [[ $ISCORE_CLASSIC_BUILD ]]; then
-	echo "Classic build only"
-	if [[ $ISCORE_INSTALL_DEPS ]]; then
-		## Qt ##
-		echo "Installing Qt..."
-		curl -O http://www.mirrorservice.org/sites/download.qt-project.org/official_releases/qt/4.8/4.8.6/qt-opensource-mac-4.8.6.dmg
-		hdiutil mount qt-opensource-mac-4.8.6.dmg
-		sudo installer -pkg "/Volumes/Qt 4.8.6/Qt.mpkg" -target /
-
-		## Gecode ##
-		echo "Installing Gecode..."
-		curl -O http://www.gecode.org/download/Gecode-3.7.3.dmg
-		hdiutil mount Gecode-3.7.3.dmg
-		sudo installer -pkg "/Volumes/Gecode/Install Gecode 3.7.3.pkg" -target /
-		hdiutil unmount /Volumes/Gecode
-
-		## libXml
-		echo "Installing libXml..."
-		curl -O http://www.explain.com.au/download/combo-2007-10-07.dmg.gz
-		gunzip combo-2007-10-07.dmg.gz
-		hdiutil mount combo-2007-10-07.dmg
-		sudo cp /Volumes/gnome-combo-2007-10-07-rw/libxml.framework /Library/Frameworks
-		hdiutil unmount /Volumes/gnome-combo-2007-10-07-rw
-	fi
-
-	if [[ $ISCORE_JAMOMA_PATH ]]; then
-		export ISCORE_SCORE_PATH=$ISCORE_JAMOMA_PATH/Core/Score
-	else
-		export ISCORE_SCORE_PATH=`pwd`/Score
-	fi
-
-	if [[ $ISCORE_CLONE_GIT ]]; then
-		if [[ $ISCORE_JAMOMA_PATH ]]; then
-			if [[ -e $ISCORE_SCORE_PATH ]]; then
-				echo "Will build using the existing Jamoma & Score installations"
-			else
-				echo "Will clone Score in the Jamoma/Core folder"
-				git clone https://github.com/OSSIA/Score $ISCORE_SCORE_PATH
-			fi
-		else
-			git clone https://github.com/OSSIA/Score
-		fi
-		(cd $ISCORE_SCORE_PATH; git checkout dev)
-
-		git clone https://github.com/i-score/i-score i-score
-		(cd i-score; git checkout dev)
-	fi
-
-	if [[ $ISCORE_INSTALL_JAMOMA ]]; then
-		sudo mkdir -p /usr/local/jamoma
-		sudo chmod -R 777 /usr/local/jamoma
-		sudo chmod -R 777 /usr/local/lib
-		cp -rf $ISCORE_SCORE_PATH/support/jamoma/ /usr/local/jamoma/
-		(cd $ISCORE_SCORE_PATH; ruby build.rb dev clean)
-	fi
-
-	if [[ $ISCORE_INSTALL_ISCORE ]]; then
-		(cd i-score; ./build.sh)
-	fi
-	exit 0
-fi
 
 #####################################
 ######### Standard Build ############
@@ -406,44 +289,21 @@ fi
 if [[ $ISCORE_CLONE_GIT ]]; then
 	# Jamoma
 	export GIT_SSL_NO_VERIFY=1
+	
+	git clone https://github.com/Jamoma/Jamoma
+	git clone -b $ISCORE_JAMOMA_BRANCH https://github.com/i-score/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
 
-	if [[ $ISCORE_JAMOMA_PATH ]]; then
-		if [[ -e $ISCORE_JAMOMA_PATH/Core/CMakeLists.txt ]]; then
-			if [[ -e $ISCORE_JAMOMA_PATH/Core/Score ]]; then
-				if [[ -e $ISCORE_JAMOMA_PATH/Core/Score/CMakeLists.txt ]]; then
-					echo "Building using the existing installation"
-				else
-					echo "Please switch OSSIA/Score to the feature/cmake branch"
-					exit 1
-				fi
-			else
-				git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git $ISCORE_JAMOMA_PATH/Score $ISCORE_DEPTH_GIT
-			fi
-		else
-			echo "Please switch Jamoma/JamomaCore to the feature/cmake branch"
-			exit 1
-		fi
-	else
-		git clone https://github.com/Jamoma/Jamoma
-		git clone -b $ISCORE_JAMOMA_BRANCH https://github.com/jamoma/JamomaCore.git Jamoma/Core $ISCORE_DEPTH_GIT
-
-		if [[ "$OSTYPE" != "linux-gnu"* ]]; then
-			git clone -b $ISCORE_JAMOMAMAX_BRANCH https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT #todo
-		fi
-
-		git clone -b $ISCORE_SCORE_BRANCH https://github.com/OSSIA/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
-
-		export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
+	if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+		git clone -b $ISCORE_JAMOMAMAX_BRANCH https://github.com/jamoma/JamomaMax.git Jamoma/Implementations/Max $ISCORE_DEPTH_GIT #todo
 	fi
 
+	git clone -b $ISCORE_SCORE_BRANCH https://github.com/i-score/Score.git Jamoma/Core/Score $ISCORE_DEPTH_GIT
 
-	# i-score
-	if [[ $ISCORE_RECAST ]]; then
-		git clone -b master https://github.com/OSSIA/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
-	elif [[ $ISCORE_INSTALL_ISCORE ]]; then
-		git clone -b $ISCORE_ISCORE_BRANCH https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
-	fi
+	export ISCORE_JAMOMA_PATH=`pwd`/Jamoma
+	
 
+	git clone -b $ISCORE_ISCORE_BRANCH https://github.com/i-score/i-score.git $ISCORE_FOLDER $ISCORE_DEPTH_GIT
+	
 	if [[ $ISCORE_FETCH_GIT ]]; then
 		(cd $ISCORE_JAMOMA_PATH/Core; git fetch --all)
 		(cd $ISCORE_JAMOMA_PATH/Core/Score; git fetch --all)
