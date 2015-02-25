@@ -386,7 +386,7 @@ if [[ $ISCORE_INSTALL_PLAYER ]]; then
 		cd build/iscore_player
 		cmake $ISCORE_JAMOMA_PATH/Core/Score/implementations/i-score $ISCORE_CMAKE_DEBUG $ISCORE_CMAKE_TOOLCHAIN
 		make -j$ISCORE_NUM_THREADS
-		make install
+		sudo make install
 	)
 fi
 
